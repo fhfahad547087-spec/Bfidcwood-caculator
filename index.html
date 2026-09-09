@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BFIDC FINAL ERP - কাঠের সাইজ লিস্ট</title>
-    <!-- Nikosh ফন্ট সিডিএন -->
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #1b4332;
-            --primary-light: #2d6a4f;
-            --primary-hover: #081c15;
+            --primary: #1e3a2f;
+            --primary-light: #2d5a46;
             --accent: #b45309;
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #4b5563;
+            --text-main: #0f172a;
+            --text-muted: #475569;
             --border: #cbd5e1;
-            --danger: #dc2626;
+            --danger: #b91c1c;
+            --edit: #2563eb;
+            --success: #15803d;
         }
 
         * {
@@ -30,72 +30,82 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            padding: 20px 15px;
-            line-height: 1.5;
-            font-size: 1.05rem;
+            padding: 20px 10px;
+            font-size: 1.1rem;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1050px;
             margin: 0 auto;
         }
 
-        /* PDF এর হুবহু হেডার ডিজাইন */
+        /* হেডার */
         header {
             background: #ffffff;
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 8px;
+            border: 2px solid #94a3b8;
+            padding: 22px;
+            border-radius: 6px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
             margin-bottom: 20px;
         }
 
         header .erp-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #111827;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
         header .sub-title {
-            font-size: 1.15rem;
-            color: #374151;
+            font-size: 1.2rem;
+            color: #334155;
             line-height: 1.6;
         }
 
         .formula-badge {
             display: inline-block;
-            background: #f1f5f9;
-            border: 1px dashed #94a3b8;
-            border-radius: 6px;
-            padding: 4px 12px;
+            background: #f8fafc;
+            border: 1px dashed #64748b;
+            padding: 3px 14px;
             margin-top: 10px;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: bold;
             color: #0f172a;
         }
 
-        /* কার্ড এবং ইনপুট ফর্ম */
+        /* কার্ড কাঠামো */
         .card {
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             border: 1px solid var(--border);
         }
 
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 14px;
             color: var(--primary);
         }
 
+        /* ফর্ম */
         .input-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 16px;
         }
@@ -106,19 +116,18 @@
         }
 
         .form-group label {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .form-group input {
-            padding: 9px 12px;
+            padding: 8px 12px;
             border: 1.5px solid var(--border);
-            border-radius: 6px;
-            font-size: 1.05rem;
+            border-radius: 4px;
+            font-size: 1.15rem;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         .form-group input:focus {
@@ -127,49 +136,35 @@
 
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         button {
             cursor: pointer;
             border: none;
-            border-radius: 6px;
-            padding: 8px 18px;
-            font-size: 1rem;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 1.05rem;
             font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             transition: all 0.2s;
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-light); }
+        .btn-secondary { background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-secondary:hover { background-color: #e2e8f0; }
+        .btn-word { background-color: #1e40af; color: white; }
+        .btn-word:hover { background-color: #1d4ed8; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: #16a34a; }
+        .btn-danger { background-color: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
+        .btn-danger:hover { background-color: #fecaca; }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-        }
-
-        .btn-secondary:hover {
-            background-color: #e2e8f0;
-        }
-
-        .btn-danger {
-            background-color: #fee2e2;
-            color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background-color: #fecaca;
-        }
-
-        /* পরিসংখ্যান */
+        /* স্ট্যাটাস কার্ড */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -179,78 +174,75 @@
 
         .stat-card {
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 14px;
             border: 1px solid var(--border);
             text-align: center;
             border-top: 4px solid var(--primary);
         }
 
-        .stat-card.accent {
-            border-top-color: var(--accent);
-        }
+        .stat-card.accent { border-top-color: var(--accent); }
 
         .stat-title {
-            font-size: 0.95rem;
+            font-size: 1.05rem;
             font-weight: bold;
             color: var(--text-muted);
             margin-bottom: 4px;
         }
 
         .stat-value {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            color: var(--primary-hover);
+            color: var(--primary);
         }
 
-        .stat-card.accent .stat-value {
-            color: var(--accent);
-        }
+        .stat-card.accent .stat-value { color: var(--accent); }
 
         /* টেবিল */
         .table-container {
             overflow-x: auto;
-            border-radius: 6px;
-            border: 1px solid var(--border);
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             text-align: center;
             background: white;
         }
 
         thead tr {
-            background-color: #f1f5f9;
-            color: #1e293b;
-            font-weight: bold;
-            border-bottom: 2px solid var(--border);
+            background-color: #e2e8f0;
+            color: #0f172a;
+            border-bottom: 2px solid #94a3b8;
         }
 
         th, td {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
+        tbody tr:nth-child(even) { background-color: #f8fafc; }
 
         .cft-cell {
             font-weight: bold;
             color: var(--primary);
         }
 
-        .action-btn {
+        .action-icon-btn {
             background: none;
             border: none;
-            color: var(--danger);
             cursor: pointer;
-            padding: 2px 6px;
+            padding: 3px 8px;
             font-size: 1rem;
+            border-radius: 4px;
         }
+
+        .btn-edit-act { color: var(--edit); }
+        .btn-del-act { color: var(--danger); }
+        .action-icon-btn:hover { background-color: #f1f5f9; }
 
         .empty-state {
             text-align: center;
@@ -258,10 +250,12 @@
             color: var(--text-muted);
         }
 
+        #backupFileInput { display: none; }
+
         @media print {
             body { background: white; padding: 0; }
             .card, header { box-shadow: none; border: 1px solid #000; }
-            .form-section, .btn-group, .action-bar, .action-btn, th:last-child, td:last-child { display: none !important; }
+            .form-section, .btn-group, .action-bar, .action-icon-btn, th:last-child, td:last-child { display: none !important; }
             table { border: 1px solid #000; width: 100%; }
             th, td { border: 1px solid #000; }
         }
@@ -270,48 +264,52 @@
 <body>
 
 <div class="container">
-    <!-- PDF এর হুবহু হেডার -->
+    <!-- অফিশিয়াল হেডার -->
     <header>
         <div class="erp-title">BFIDC FINAL ERP</div>
         <div class="sub-title">
             বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-            প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।
+            প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[span_0](start_span)[span_0](end_span)
         </div>
         <div class="formula-badge">
-            সূত্র: (বেড়" × বেড়" × লম্বা') ÷ ২৩MD = CFT (দশমিকের পর ২ ঘর)
+            সূত্র: (বেড়" × বেড়" × লম্বা') ÷ ২৩MD = সিএফটি (দশমিকের পর ২ ঘর)
         </div>
     </header>
 
-    <!-- ইনপুট ফর্ম -->
+    <!-- ডাটা এন্ট্রি / এডিট ফর্ম -->
     <div class="card form-section">
-        <div class="card-title">নতুন কাঠের সাইজ যোগ করুন</div>
-        <form id="woodForm" onsubmit="addRow(event)">
+        <div class="card-header">
+            <div class="card-title" id="formHeaderTitle">নতুন সাইজ যোগ করুন</div>
+            <div id="editingBadge" style="display:none; color: var(--edit); font-weight: bold;">(এডিট মোড চলছে)</div>
+        </div>
+        <form id="woodForm" onsubmit="handleFormSubmit(event)">
+            <input type="hidden" id="editId" value="">
             <div class="input-grid">
                 <div class="form-group">
-                    <label for="treeNo">গাছ/পিস</label>
-                    <input type="text" id="treeNo" placeholder="যেমন: 310/1" required autocomplete="off">
+                    <label for="treeNo">গাছ/পিস নম্বর</label>
+                    <input type="text" id="treeNo" placeholder="উদা: 310/1" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="girth">বেড় (ইঞ্চি - ")</label>
-                    <input type="number" id="girth" step="any" placeholder="যেমন: 30" required>
+                    <input type="number" id="girth" step="any" placeholder="30" required>
                 </div>
                 <div class="form-group">
                     <label for="length">লম্বা (ফুট - ')</label>
-                    <input type="number" id="length" step="any" placeholder="যেমন: 5" required>
+                    <input type="number" id="length" step="any" placeholder="5" required>
                 </div>
                 <div class="form-group">
-                    <label for="cftPreview">সিএফটি (CFT)</label>
+                    <label for="cftPreview">হিসাবকৃত CFT</label>
                     <input type="text" id="cftPreview" placeholder="0.00" readonly style="background-color: #f1f5f9; font-weight: bold; color: var(--primary);">
                 </div>
             </div>
             <div class="btn-group">
-                <button type="submit" class="btn-primary">লিস্টে যোগ করুন</button>
-                <button type="button" class="btn-secondary" onclick="clearForm()">রিসেট</button>
+                <button type="submit" class="btn-primary" id="submitBtn">লিস্টে যোগ করুন</button>
+                <button type="button" class="btn-secondary" onclick="resetForm()">রিসেট / বাতিল</button>
             </div>
         </form>
     </div>
 
-    <!-- মোট হিসাব -->
+    <!-- মোট পরিসংখ্যান -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-title">মোট গাছ</div>
@@ -322,52 +320,59 @@
             <div class="stat-value" id="totalPieces">0 টি</div>
         </div>
         <div class="stat-card accent">
-            <div class="stat-title">মোট সিএফটি</div>
+            <div class="stat-title">মোট সিএফটি (CFT)</div>
             <div class="stat-value" id="totalCFT">0.00</div>
         </div>
     </div>
 
-    <!-- টেবিল তালিকা -->
+    <!-- টেবিল ও ব্যাকআপ/এক্সপোর্ট টুলস -->
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div class="card-title" style="margin-bottom: 0;">সাইজ তালিকা</div>
-            <div class="action-bar">
-                <button type="button" class="btn-secondary" onclick="window.print()" style="font-size: 0.9rem;">🖨️ প্রিন্ট / PDF</button>
-                <button type="button" class="btn-danger" onclick="clearAllData()" style="font-size: 0.9rem;">🗑️ সব মুছুন</button>
+        <div class="card-header">
+            <div class="card-title">কাঠের সাইজ তালিকা</div>
+            <div class="btn-group action-bar">
+                <button type="button" class="btn-word" onclick="exportToWord()">📄 Word ফাইলে সেভ</button>
+                <button type="button" class="btn-success" onclick="downloadBackup()">💾 ব্যাকআপ ডাউনলোড</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('backupFileInput').click()">📥 ব্যাকআপ রিস্টোর</button>
+                <input type="file" id="backupFileInput" accept=".json" onchange="restoreBackup(event)">
+                <button type="button" class="btn-secondary" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
+                <button type="button" class="btn-danger" onclick="clearAllData()">🗑️ সব মুছুন</button>
             </div>
         </div>
 
         <div class="table-container">
-            <table>
+            <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">ক্রমিক</th>
-                        <th>গাছ/পিস</th>
+                        <th style="width: 70px;">গাছ/পিস</th>
                         <th>সাইজ</th>
                         <th>সিএফটি</th>
-                        <th style="width: 70px;">অ্যাকশন</th>
+                        <th style="width: 100px;">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody id="logTableBody"></tbody>
             </table>
-            <div id="emptyState" class="empty-state">এখনও কোনো মাপ যোগ করা হয়নি।</div>
+            <div id="emptyState" class="empty-state">কোনো ডাটা পাওয়া যায়নি। উপরে মাপ লিখে যুক্ত করুন।</div>
         </div>
     </div>
 </div>
 
 <script>
     const FORMULA_DIVISOR = 2304;
-    let logList = JSON.parse(localStorage.getItem('bfidc_wood_data')) || [];
+    let logList = JSON.parse(localStorage.getItem('bfidc_wood_pro_data')) || [];
 
     const girthInput = document.getElementById('girth');
     const lengthInput = document.getElementById('length');
     const cftPreview = document.getElementById('cftPreview');
     const treeNoInput = document.getElementById('treeNo');
+    const editIdInput = document.getElementById('editId');
+    const submitBtn = document.getElementById('submitBtn');
+    const formHeaderTitle = document.getElementById('formHeaderTitle');
+    const editingBadge = document.getElementById('editingBadge');
 
     function calculateCFT(girth, length) {
         if (!girth || !length || girth <= 0 || length <= 0) return 0;
-        const cft = (girth * girth * length) / FORMULA_DIVISOR;
-        return Math.round(cft * 100) / 100;
+        const val = (girth * girth * length) / FORMULA_DIVISOR;
+        return Math.round(val * 100) / 100;
     }
 
     function updatePreview() {
@@ -383,58 +388,98 @@
     girthInput.addEventListener('input', updatePreview);
     lengthInput.addEventListener('input', updatePreview);
 
-    function addRow(e) {
+    function handleFormSubmit(e) {
         e.preventDefault();
         const treeNo = treeNoInput.value.trim();
         const girth = parseFloat(girthInput.value);
         const length = parseFloat(lengthInput.value);
+        const editId = editIdInput.value;
 
         if (!treeNo || isNaN(girth) || isNaN(length) || girth <= 0 || length <= 0) return;
 
-        const cft = calculateCFT(girth, length);
+        const cft = calculateCFT(girth, length).toFixed(2);
 
-        logList.push({
-            id: Date.now(),
-            treeNo: treeNo,
-            sizeText: `${girth}"×${length}'`,
-            cft: cft.toFixed(2)
-        });
+        if (editId) {
+            // এডিট আপডেট
+            const index = logList.findIndex(item => item.id == editId);
+            if (index !== -1) {
+                logList[index].treeNo = treeNo;
+                logList[index].girth = girth;
+                logList[index].length = length;
+                logList[index].sizeText = `${girth}"×${length}'`;
+                logList[index].cft = cft;
+            }
+            resetForm();
+        } else {
+            // নতুন যোগ
+            logList.push({
+                id: Date.now(),
+                treeNo: treeNo,
+                girth: girth,
+                length: length,
+                sizeText: `${girth}"×${length}'`,
+                cft: cft
+            });
 
-        saveAndRender();
-
-        const parts = treeNo.split('/');
-        if (parts.length === 2 && !isNaN(parts[1])) {
-            treeNoInput.value = `${parts[0]}/${parseInt(parts[1]) + 1}`;
+            // পরের সিরিয়াল প্রেডিকশন
+            const parts = treeNo.split('/');
+            if (parts.length === 2 && !isNaN(parts[1])) {
+                treeNoInput.value = `${parts[0]}/${parseInt(parts[1]) + 1}`;
+            }
+            girthInput.value = '';
+            lengthInput.value = '';
+            cftPreview.value = '';
+            girthInput.focus();
         }
 
-        girthInput.value = '';
-        lengthInput.value = '';
-        cftPreview.value = '';
-        girthInput.focus();
+        saveAndRender();
+    }
+
+    function editRow(id) {
+        const item = logList.find(i => i.id === id);
+        if (!item) return;
+
+        editIdInput.value = item.id;
+        treeNoInput.value = item.treeNo;
+        girthInput.value = item.girth;
+        lengthInput.value = item.length;
+        cftPreview.value = item.cft;
+
+        submitBtn.textContent = 'আপডেট করুন';
+        submitBtn.className = 'btn-primary';
+        formHeaderTitle.textContent = 'তথ্য সংশোধন (Edit)';
+        editingBadge.style.display = 'inline';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function deleteRow(id) {
-        logList = logList.filter(item => item.id !== id);
-        saveAndRender();
+        if (confirm('এই লাইনটি মুছে ফেলতে চান?')) {
+            logList = logList.filter(item => item.id !== id);
+            saveAndRender();
+        }
+    }
+
+    function resetForm() {
+        editIdInput.value = '';
+        treeNoInput.value = '';
+        girthInput.value = '';
+        lengthInput.value = '';
+        cftPreview.value = '';
+        submitBtn.textContent = 'লিস্টে যোগ করুন';
+        formHeaderTitle.textContent = 'নতুন সাইজ যোগ করুন';
+        editingBadge.style.display = 'none';
+        treeNoInput.focus();
     }
 
     function clearAllData() {
-        if (logList.length && confirm('সব ডাটা মুছে ফেলতে চান?')) {
+        if (logList.length && confirm('সতর্কতা: পুরো তালিকা মুছে ফেলতে চান?')) {
             logList = [];
             saveAndRender();
         }
     }
 
-    function clearForm() {
-        treeNoInput.value = '';
-        girthInput.value = '';
-        lengthInput.value = '';
-        cftPreview.value = '';
-        treeNoInput.focus();
-    }
-
     function saveAndRender() {
-        localStorage.setItem('bfidc_wood_data', JSON.stringify(logList));
+        localStorage.setItem('bfidc_wood_pro_data', JSON.stringify(logList));
         renderTable();
         updateSummary();
     }
@@ -450,15 +495,15 @@
         }
         emptyState.style.display = 'none';
 
-        logList.forEach((item, index) => {
+        logList.forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${index + 1}</td>
                 <td><strong>${item.treeNo}</strong></td>
                 <td>${item.sizeText}</td>
                 <td class="cft-cell">${item.cft}</td>
                 <td>
-                    <button class="action-btn" title="মুছুন" onclick="deleteRow(${item.id})">✕</button>
+                    <button class="action-icon-btn btn-edit-act" title="এডিট করুন" onclick="editRow(${item.id})">✏️</button>
+                    <button class="action-icon-btn btn-del-act" title="মুছুন" onclick="deleteRow(${item.id})">✕</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -477,6 +522,124 @@
         document.getElementById('totalTrees').textContent = `${treeSet.size} টি`[span_1](start_span)[span_1](end_span);
         document.getElementById('totalPieces').textContent = `${logList.length} টি`[span_2](start_span)[span_2](end_span);
         document.getElementById('totalCFT').textContent = totalCFT.toFixed(2);
+    }
+
+    // ব্যাকআপ ডাউনলোড (JSON Save)
+    function downloadBackup() {
+        if (!logList.length) {
+            alert('ডাউনলোড করার মতো কোনো ডাটা নেই!');
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logList, null, 2));
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", `wood_records_backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
+    // ব্যাকআপ ফাইল রিস্টোর (JSON Restore)
+    function restoreBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsedData = JSON.parse(e.target.result);
+                if (Array.isArray(parsedData)) {
+                    logList = parsedData;
+                    saveAndRender();
+                    alert('সফলভাবে ব্যাকআপ ডাটা লোড হয়েছে!');
+                } else {
+                    alert('ভুল ফাইল ফরম্যাট!');
+                }
+            } catch (err) {
+                alert('ফাইলটি পড়া সম্ভব হয়নি!');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // Word ফাইল (.doc) এক্সপোর্ট
+    function exportToWord() {
+        if (!logList.length) {
+            alert('তালিকায় কোনো ডাটা নেই!');
+            return;
+        }
+
+        const treeSet = new Set();
+        let totalCFT = 0;
+        let rowsHtml = '';
+
+        logList.forEach(item => {
+            treeSet.add(item.treeNo.split('/')[0]);
+            totalCFT += parseFloat(item.cft) || 0;
+            rowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.treeNo}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.sizeText}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.cft}</td>
+                </tr>
+            `;
+        });
+
+        const wordContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <title>BFIDC কাঠের সাইজ লিস্ট</title>
+                <style>
+                    body { font-family: 'Nikosh', Arial, sans-serif; }
+                    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+                    th { border: 1px solid #000; padding: 8px; background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <div style="text-align: center;">
+                    <h2>BFIDC FINAL ERP</h2>
+                    <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
+                    প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>গাছ/পিস</th>
+                            <th>সাইজ</th>
+                            <th>সিএফটি</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                        <tr>
+                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট গাছ:</td>
+                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${treeSet.size} টি</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট পিস:</td>
+                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${logList.length} টি</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট সিএফটি:</td>
+                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${totalCFT.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob(['\ufeff' + wordContent], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BFIDC_Wood_List_${new Date().toISOString().slice(0,10)}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
     }
 
     renderTable();
