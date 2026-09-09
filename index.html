@@ -19,11 +19,11 @@
         .input-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
         .field { flex: 1; min-width: 140px; display: flex; flex-direction: column; }
         .field label { font-size: 16px; font-weight: bold; margin-bottom: 3px; }
-        .field input { padding: 8px; font-size: 18px; border: 1px solid #64748b; border-radius: 3px; outline: none; }
+        .field input { padding: 10px; font-size: 18px; border: 1px solid #64748b; border-radius: 3px; outline: none; }
         .field input:focus { border-color: #1b4332; background: #fff; box-shadow: 0 0 4px rgba(27,67,50,0.4); }
         
         .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        button { cursor: pointer; padding: 8px 14px; font-size: 17px; font-weight: bold; border-radius: 3px; border: 1px solid #333; }
+        button { cursor: pointer; padding: 10px 16px; font-size: 17px; font-weight: bold; border-radius: 3px; border: 1px solid #333; }
         .btn-add { background: #1b4332; color: #fff; border: none; }
         .btn-word { background: #1e40af; color: #fff; border: none; }
         .btn-print { background: #e2e8f0; }
@@ -119,12 +119,7 @@
     document.getElementById('gardenInput').value = garden;
     document.getElementById('gardenNameText').innerText = garden;
 
-    function changeGarden() {
-        const val = document.getElementById('gardenInput').value.trim() || '................';
-        document.getElementById('gardenNameText').innerText = val;
-        localStorage.setItem('bfidc_simple_garden', val);
-    }
-
+    // এন্টার কি হ্যান্ডেল করা
     function handleEnter(e, nextId) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -132,6 +127,7 @@
         }
     }
 
+    // লম্বা লিখে এন্টার দিলে ডাটা যোগ হবে
     function handleEnterLength(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -139,42 +135,49 @@
         }
     }
 
-    function truncateTo2Decimals(num) {
-        const str = num.toString();
-        if (str.indexOf('.') !== -1) {
-            const parts = str.split('.');
-            return parts[0] + '.' + parts[1].substring(0, 2).padEnd(2, '0');
-        }
-        return num.toFixed(2);
+    function changeGarden() {
+        const val = document.getElementById('gardenInput').value.trim() || '................';
+        document.getElementById('gardenNameText').innerText = val;
+        localStorage.setItem('bfidc_simple_garden', val);
     }
 
     function addNewSize() {
-        const pNo = document.getElementById('pieceNo').value.trim();
-        const g = parseFloat(document.getElementById('girth').value);
-        const l = parseFloat(document.getElementById('length').value);
+        const pNoField = document.getElementById('pieceNo');
+        const girthField = document.getElementById('girth');
+        const lengthField = document.getElementById('length');
+
+        const pNo = pNoField.value.trim();
+        const g = parseFloat(girthField.value);
+        const l = parseFloat(lengthField.value);
 
         if (!pNo || isNaN(g) || isNaN(l) || g <= 0 || l <= 0) {
             alert('সঠিক মাপ ও গাছ/পিস নম্বর দিন!');
             return;
         }
 
+        // CFT Calculation: (Girth * Girth * Length) / 2304
         const rawCft = (g * g * l) / 2304;
-        const exactCft = truncateTo2Decimals(rawCft);
+        const formattedCft = rawCft.toFixed(2); // দশমিকের পর ২ ঘর
 
         records.push({
             pNo: pNo,
-            size: `${g}"×${l}'`,
-            cft: exactCft
+            size: `${g}" × ${l}'`,
+            cft: formattedCft
         });
 
-        const splitted = pNo.split('/');
-        if (splitted.length === 2 && !isNaN(splitted[1])) {
-            document.getElementById('pieceNo').value = splitted[0] + '/' + (parseInt(splitted[1]) + 1);
+        // পিস নম্বর অটো বাড়ানো (১/১ থেকে ১/২)
+        let parts = pNo.split('/');
+        if (parts.length === 2 && !isNaN(parts[1])) {
+            let nextPiece = parseInt(parts[1]) + 1;
+            pNoField.value = parts[0] + '/' + nextPiece;
         }
 
-        document.getElementById('girth').value = '';
-        document.getElementById('length').value = '';
-        document.getElementById('girth').focus();
+        // ইনপুট ক্লিয়ার করা
+        girthField.value = '';
+        lengthField.value = '';
+
+        // লিস্টে যোগ হওয়ার পর কার্সর গাছ/পিস (pieceNo) বক্সে যাবে
+        pNoField.focus();
 
         saveAndRender();
     }
@@ -202,9 +205,8 @@
         let totalCftFloat = 0;
 
         records.forEach((item, idx) => {
-            const rootTree = item.pNo.split(/[\/\-_]/)[0].trim();
+            const rootTree = item.pNo.split('/')[0].trim();
             if (rootTree) treeSet.add(rootTree);
-
             totalCftFloat += parseFloat(item.cft);
 
             tbody.innerHTML += `
@@ -217,8 +219,8 @@
             `;
         });
 
-        document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি'[cite: 1];
-        document.getElementById('dispTotalPieces').innerText = records.length + ' টি'[cite: 1];
+        document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি';
+        document.getElementById('dispTotalPieces').innerText = records.length + ' টি';
         document.getElementById('dispTotalCFT').innerText = totalCftFloat.toFixed(2);
     }
 
@@ -229,15 +231,11 @@
         }
 
         const gardenName = document.getElementById('gardenNameText').innerText;
-        const treeSet = new Set();
         let totalCftFloat = 0;
         let rows = '';
 
         records.forEach(item => {
-            const rootTree = item.pNo.split(/[\/\-_]/)[0].trim();
-            if (rootTree) treeSet.add(rootTree);
             totalCftFloat += parseFloat(item.cft);
-
             rows += `<tr>
                 <td style="border:1px solid #000; text-align:center; padding:5px;">${item.pNo}</td>
                 <td style="border:1px solid #000; text-align:center; padding:5px;">${item.size}</td>
@@ -247,12 +245,11 @@
 
         const htmlDoc = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <head><meta charset='utf-8'><title>BFIDC FINAL ERP</title></head>
+            <head><meta charset='utf-8'></head>
             <body style="font-family:'Nikosh', Arial; text-align:center;">
                 <h2>BFIDC FINAL ERP</h2>
-                <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, <b>${gardenName}</b> রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-                প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[cite: 1]</p>
-                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, ${gardenName} রাবার বাগান হতে বিএফআইডিসি, এলপিসি প্রেরণের সাইজ লিস্ট।</p>
+                <table style="width:100%; border-collapse:collapse;">
                     <thead>
                         <tr style="background:#eee;">
                             <th style="border:1px solid #000; padding:6px;">গাছ/পিস</th>
@@ -262,34 +259,22 @@
                     </thead>
                     <tbody>
                         ${rows}
-                        <tr>
-                            <td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট গাছ:</td>
-                            <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${treeSet.size} টি</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট পিস:</td>
-                            <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${records.length} টি</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট সিএফটি:</td>
-                            <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${totalCftFloat.toFixed(2)}</td>
-                        </tr>
+                        <tr><td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট সিএফটি:</td>
+                        <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${totalCftFloat.toFixed(2)}</td></tr>
                     </tbody>
                 </table>
             </body>
             </html>`;
 
         const blob = new Blob(['\ufeff' + htmlDoc], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `BFIDC_${gardenName}_Wood_List.doc`;
-        document.body.appendChild(a);
+        a.href = url;
+        a.download = `Wood_List_${gardenName}.doc`;
         a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
     }
 
-    saveAndRender();
+    window.onload = saveAndRender;
 </script>
 
 </body>
