@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - MULTI-PAGE WATERMARK</title>
+    <title>BFIDC WOOD ERP - FIX COLUMN EDIT</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
         body { background: #f0f2f5; padding: 10px; color: #000; }
 
-        /* ইনপুট প্যানেল ডিজাইন */
+        /* Input Panel */
         .input-panel { 
             max-width: 950px; margin: 0 auto 20px auto; background: #fff; padding: 15px; 
             border-radius: 10px; border: 2px solid #1b4332; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
@@ -25,10 +25,23 @@
         .btn-update { background: #ca8a04 !important; color: white; }
         .btn-print { background: #333; color: white; }
 
-        /* প্রিভিউ কন্টেইনার (মোবাইলে স্ক্রল করার জন্য) */
+        /* Multi-page Watermark Setup */
+        .watermark {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140mm; 
+            opacity: 0.12; 
+            z-index: 0; 
+            pointer-events: none;
+            display: block;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
         .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
 
-        /* A4 পেজ ডিজাইন */
+        /* A4 Page Layout */
         .wrapper { 
             width: 210mm; 
             min-height: 297mm; 
@@ -40,34 +53,21 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
 
-        /* লোগো ওয়াটারমার্ক - প্রতিটি পেজের জন্য */
-        .watermark {
-            position: fixed; /* এটি প্রতিটি পেজে লোগোটি রিপিট করবে */
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140mm; 
-            opacity: 0.12; 
-            z-index: 0; 
-            pointer-events: none;
-            display: block;
-            /* গ্রাফিক্স অটোমেটিক চালু করার জন্য */
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
         .header-section { text-align: center; margin-bottom: 10px; position: relative; z-index: 1; }
         .header-section h2 { font-size: 22px; font-weight: bold; text-decoration: underline; }
         
         .meta-info { display: flex; justify-content: space-between; margin-top: 15px; font-size: 18px; font-weight: bold; position: relative; z-index: 1; }
         .meta-info div { flex: 1; }
 
+        /* Table Design */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; background: transparent; }
-        th, td { border: 1px solid #000; padding: 5px 2px; text-align: center; font-size: 16px; }
+        th, td { border: 1px solid #000; padding: 5px 2px; text-align: center; font-size: 15px; vertical-align: middle; }
         th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
 
-        .action-btns { display: flex; justify-content: center; gap: 4px; }
-        .edit-btn { background: #ca8a04; color: white; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: none; }
-        .del-btn { background: #ef4444; color: white; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: none; }
+        /* Action Buttons in Table */
+        .action-btns { display: flex; justify-content: center; gap: 2px; border: none !important; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 3px 6px; border-radius: 3px; border: none; cursor: pointer; }
+        .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 3px 6px; border-radius: 3px; border: none; cursor: pointer; }
 
         .totals-footer { margin-top: 25px; font-weight: bold; font-size: 19px; border-top: 2px solid #000; padding-top: 10px; position: relative; z-index: 1; }
 
@@ -77,19 +77,11 @@
             .preview-container { overflow: visible; }
             .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; box-shadow: none; }
             @page { size: A4; margin: 0; }
-            .watermark { 
-                position: fixed !important; /* প্রিন্ট করার সময় প্রতিটি পেজে ফিক্সড থাকবে */
-                opacity: 0.15 !important; 
-                visibility: visible !important;
-                display: block !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
         }
 
         @media (max-width: 600px) {
             .field { min-width: 100%; }
-            .header-section h2 { font-size: 18px; }
             .meta-info { font-size: 14px; flex-direction: column; gap: 5px; }
             .meta-info div { text-align: left !important; }
         }
@@ -98,7 +90,6 @@
 <body>
 
 <div class="input-panel">
-    <!-- ইনপুট ফিল্ড সমূহ -->
     <div class="input-row">
         <div class="field"><label>বাগানের নাম:</label><input type="text" id="gardenInput" value="দাঁতমারা" oninput="updateHeader()"></div>
         <div class="field"><label>সূত্র:</label><input type="text" id="sutraInput" oninput="updateHeader()"></div>
@@ -107,24 +98,22 @@
     </div>
     <div class="input-row">
         <div class="field"><label>গাছের নম্বর/পিস:</label><input type="text" id="pieceNo" value="1/1" onkeydown="handleEnter(event, 'girth')"></div>
-        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="ইংরেজি সংখ্যা" onkeydown="handleEnter(event, 'length')"></div>
-        <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="ইংরেজি সংখ্যা" onkeydown="handleEnterLength(event)"></div>
+        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="বেড়" onkeydown="handleEnter(event, 'length')"></div>
+        <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="লম্বা" onkeydown="handleEnterLength(event)"></div>
     </div>
     <div class="btn-group">
         <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
         <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
         <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 নতুন ট্রাক (Archive)</button>
-        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 ব্যাকআপ ফাইল</button>
-        <button style="background:#d90429; color:white" onclick="clearCurrent()">তালিকা ক্লিয়ার</button>
+        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 ফাইল ব্যাকআপ</button>
+        <button style="background:#d90429; color:white" onclick="clearCurrent()">মুছুন</button>
     </div>
     <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:10px; text-align:center;">অটো সেভ সচল...</div>
 </div>
 
 <div class="preview-container">
     <div class="wrapper">
-        <!-- Watermark Logo repeats on every page in print -->
         <img src="logo.png" class="watermark" alt="Logo">
-
         <div class="header-section">
             <h2>বিএফআইডিসি, <span id="gardenLabel">দাঁতমারা</span> রাবার বাগানের জীবনচক্র হারানো রাবার গাছের পরিমাপকৃত সাইজ লিস্ট</h2>
         </div>
@@ -136,9 +125,16 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                    <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                    <th style="width: 6%;" class="action-btns">E</th>
+                    <th style="width: 6%;">ক্রমিক</th>
+                    <th style="width: 12%;">গাছের নম্বর</th>
+                    <th style="width: 13%;">পরিমাপ</th>
+                    <th style="width: 9%;">ঘনফুট</th>
+                    <th style="width: 10%;" class="action-btns">E | X</th>
+                    <th style="width: 6%;">ক্রমিক</th>
+                    <th style="width: 12%;">গাছের নম্বর</th>
+                    <th style="width: 13%;">পরিমাপ</th>
+                    <th style="width: 9%;">ঘনফুট</th>
+                    <th style="width: 10%;" class="action-btns">E | X</th>
                 </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
@@ -149,7 +145,7 @@
 
 <div class="history-section" style="max-width: 950px; margin: 10px auto; padding:15px; background:#fff; border-radius:10px; border:1px solid #94a3b8;">
     <h3 style="margin-bottom:10px; font-size:16px;">📜 সংরক্ষিত ট্রাক (History)</h3>
-    <div id="historyList" style="font-size:14px;"></div>
+    <div id="historyList"></div>
 </div>
 
 <script>
@@ -157,7 +153,6 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
-    // সংখ্যা বাংলা করা
     function toBn(n) {
         if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
@@ -180,11 +175,10 @@
         const lVal = document.getElementById('length').value;
         const addBtn = document.getElementById('mainAddBtn');
         
-        if (!pNoField.value || !gVal || !lVal) return alert('সবগুলো ঘর পূরণ করুন');
+        if (!pNoField.value || !gVal || !lVal) return alert('সব ঘর পূরণ করুন');
 
         const g = parseFloat(gVal);
         const l = parseFloat(lVal);
-        // ২.২৬৬২৫ আসলে ২.২৬ দেখানো (Truncate logic)
         const cft = (Math.floor(((g * g * l) / 2304) * 100) / 100).toFixed(2);
         const entry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: cft };
 
@@ -200,7 +194,6 @@
                 pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
             }
         }
-        
         document.getElementById('girth').value = '';
         document.getElementById('length').value = '';
         pNoField.focus();
@@ -213,25 +206,40 @@
         tbody.innerHTML = '';
         let totalCft = 0; let treeSet = new Set();
         
-        const rowCount = Math.max(Math.ceil(records.length / 2), 40); 
-        for (let i = 0; i < rowCount; i++) {
-            const left = records[i] || null;
-            const right = records[i + rowCount] || null;
+        // এখানে কলাম ঠিক করার লজিক (৪০ সারি পর পর ভাগ হবে)
+        const rowLimit = 40; 
+        const displayRows = Math.max(Math.ceil(records.length / 2), rowLimit);
+        
+        // বর্তমান রেকর্ডের ভিত্তিতে লুপ
+        const totalItems = records.length;
+
+        for (let i = 0; i < displayRows; i++) {
+            const leftIdx = i;
+            const rightIdx = i + displayRows;
+
+            const left = records[leftIdx] || null;
+            const right = records[rightIdx] || null;
+
+            if (!left && !right && i >= totalItems) break;
+
             tbody.innerHTML += `<tr>
-                <td>${left ? toBn(i + 1) : ''}</td>
+                <td>${left ? toBn(leftIdx + 1) : ''}</td>
                 <td>${left ? toBn(left.pNo) : ''}</td>
                 <td>${left ? toBn(left.size) : ''}</td>
                 <td>${left ? toBn(left.cft) : ''}</td>
-                <td>${right ? toBn(i + rowCount + 1) : ''}</td>
+                <td class="action-btns">
+                    ${left ? `<button class="edit-btn" onclick="editRow(${leftIdx})">E</button><button class="del-btn" onclick="removeRow(${leftIdx})">X</button>` : ''}
+                </td>
+                <td>${right ? toBn(rightIdx + 1) : ''}</td>
                 <td>${right ? toBn(right.pNo) : ''}</td>
                 <td>${right ? toBn(right.size) : ''}</td>
                 <td>${right ? toBn(right.cft) : ''}</td>
                 <td class="action-btns">
-                    ${left ? `<button class="edit-btn" onclick="editRow(${i})">E</button>` : ''}
-                    ${left ? `<button class="del-btn" onclick="removeRow(${i})">X</button>` : ''}
+                    ${right ? `<button class="edit-btn" onclick="editRow(${rightIdx})">E</button><button class="del-btn" onclick="removeRow(${rightIdx})">X</button>` : ''}
                 </td>
             </tr>`;
         }
+
         records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
         document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalCft.toFixed(2))}`;
         renderHistory();
@@ -288,7 +296,6 @@
 
     function deleteHistory(idx) { if(confirm('হিস্ট্রি থেকে ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
 
-    // ১৫ সেকেন্ডের অটো সেভ
     setInterval(() => {
         localStorage.setItem('bfidc_records', JSON.stringify(records));
         document.getElementById('autoSaveStatus').innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString());
