@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - FINAL VERSION</title>
+    <title>BFIDC WOOD ERP - SMART EDIT VERSION</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
@@ -27,8 +27,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%; /* এ৪ সাইজের সাথে সামঞ্জস্যপূর্ণ */
-            opacity: 0.1; /* ২৫% এর বদলে আরও আবছা করা হয়েছে টেক্সট বোঝার জন্য */
+            width: 80%; 
+            opacity: 0.1; 
             z-index: 0;
             pointer-events: none;
         }
@@ -56,15 +56,16 @@
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         button { cursor: pointer; padding: 8px 12px; font-weight: bold; border-radius: 4px; border: none; font-size: 14px; }
         .btn-add { background: #1b4332; color: white; }
+        .btn-update { background: #ca8a04 !important; color: white; } /* এডিট মুডের জন্য আলাদা কালার */
         .btn-new-truck { background: #0891b2; color: white; }
         .btn-save { background: #1e40af; color: white; }
         .btn-print { background: #333; color: white; }
         .btn-clear { background: #d90429; color: white; }
 
-        /* Actions in Table */
-        .action-btns { display: flex; justify-content: center; gap: 4px; }
-        .edit-btn { background: #ca8a04; color: white; font-size: 10px; padding: 2px 4px; border-radius: 2px; }
-        .del-btn { background: #ef4444; color: white; font-size: 10px; padding: 2px 4px; border-radius: 2px; }
+        /* Table Action UI */
+        .action-btns { display: flex; justify-content: center; gap: 3px; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 10px; padding: 2px 5px; border-radius: 2px; cursor: pointer; border: none; }
+        .del-btn { background: #ef4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 2px; cursor: pointer; border: none; }
 
         /* History */
         .history-section { max-width: 950px; margin: 20px auto; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #94a3b8; }
@@ -96,7 +97,7 @@
         <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="লম্বা" onkeydown="handleEnterLength(event)"></div>
     </div>
     <div class="btn-group">
-        <button class="btn-add" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
+        <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
         <button class="btn-new-truck" onclick="archiveTruck()">🚚 ট্রাক আর্কাইভ (নতুন ট্রাক)</button>
         <button class="btn-save" onclick="saveDataFile()">💾 JSON ব্যাকআপ</button>
         <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট করুন</button>
@@ -106,7 +107,7 @@
 </div>
 
 <div class="wrapper">
-    <!-- Logo Watermark from GitHub -->
+    <!-- Watermark Logo -->
     <img src="logo.png" class="watermark" alt="BFIDC Logo">
 
     <div class="header-section">
@@ -138,8 +139,8 @@
 <script>
     let records = JSON.parse(localStorage.getItem('bfidc_records')) || [];
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
+    let editIndex = null; // কোন সারি এডিট হচ্ছে তা মনে রাখার জন্য
 
-    // ইংরেজি থেকে বাংলা নাম্বার কনভার্টার
     function toBn(n) {
         if (n === null || n === undefined) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
@@ -162,6 +163,7 @@
         const pNoField = document.getElementById('pieceNo');
         const gVal = document.getElementById('girth').value;
         const lVal = document.getElementById('length').value;
+        const addBtn = document.getElementById('mainAddBtn');
         
         const g = parseFloat(gVal);
         const l = parseFloat(lVal);
@@ -169,20 +171,21 @@
         if (!pNoField.value || isNaN(g) || isNaN(l)) return alert('সঠিক মাপ দিন');
 
         const formattedCft = truncateToTwoDecimals((g * g * l) / 2304);
-        
-        // লিস্টে ডাটা যোগ
-        records.push({ 
-            pNo: pNoField.value, 
-            gVal: g, 
-            lVal: l, 
-            size: `${g}"×${l}'`, 
-            cft: formattedCft 
-        });
+        const newEntry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: formattedCft };
 
-        // অটো ইনক্রিমেন্ট ১/১ -> ১/২
-        let parts = pNoField.value.split('/');
-        if (parts.length === 2 && !isNaN(parts[1])) {
-            pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
+        if (editIndex !== null) {
+            // যদি এডিট মুডে থাকে, তবে আগের পজিশনেই আপডেট হবে
+            records[editIndex] = newEntry;
+            editIndex = null;
+            addBtn.innerText = "+ লিস্টে যোগ করুন";
+            addBtn.classList.remove('btn-update');
+        } else {
+            // নতুন ডাটা যোগ করার সময় শেষে বসবে এবং পিস নম্বর বাড়বে
+            records.push(newEntry);
+            let parts = pNoField.value.split('/');
+            if (parts.length === 2 && !isNaN(parts[1])) {
+                pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
+            }
         }
         
         document.getElementById('girth').value = '';
@@ -217,27 +220,36 @@
                 </td>
             </tr>`;
         }
-        records.forEach(r => { 
-            totalCft += parseFloat(r.cft); 
-            treeSet.add(r.pNo.split('/')[0]); 
-        });
+        records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
         document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalCft.toFixed(2))}`;
         renderHistory();
     }
 
-    // সারি এডিট করার ফাংশন
+    // স্মার্ট এডিট ফাংশন: সারি পরিবর্তন না করেই এডিট করা
     function editRow(idx) {
         const item = records[idx];
+        const addBtn = document.getElementById('mainAddBtn');
+        
+        editIndex = idx; // কোন ইনডেক্স এডিট হচ্ছে তা সেভ রাখা
         document.getElementById('pieceNo').value = item.pNo;
         document.getElementById('girth').value = item.gVal;
         document.getElementById('length').value = item.lVal;
-        records.splice(idx, 1); // সংশোধন করার জন্য আগেরটি ডিলিট করে ইনপুটে নেওয়া
-        saveAndRender();
+        
+        addBtn.innerText = "সংশোধন করুন (Update)";
+        addBtn.classList.add('btn-update');
+        
         document.getElementById('girth').focus();
     }
 
     function removeRow(idx) { if(confirm('ডিলিট করবেন?')) { records.splice(idx, 1); saveAndRender(); } }
-    function clearCurrent() { if (confirm('সব মুছবেন?')) { records = []; saveAndRender(); } }
+    
+    function clearCurrent() { 
+        if (confirm('সব মুছবেন?')) { 
+            records = []; editIndex = null;
+            document.getElementById('mainAddBtn').innerText = "+ লিস্টে যোগ করুন";
+            saveAndRender(); 
+        } 
+    }
 
     function archiveTruck() {
         if (records.length === 0) return alert('কোনো ডাটা নেই!');
@@ -250,7 +262,7 @@
         };
         historyLogs.push(truck);
         localStorage.setItem('bfidc_history', JSON.stringify(historyLogs));
-        records = []; // লিস্ট খালি করা
+        records = [];
         alert('ট্রাক সংরক্ষিত হয়েছে। গাছের নম্বর আগের সিরিয়ালেই থাকবে।');
         saveAndRender();
     }
@@ -261,8 +273,8 @@
             <div class="history-item">
                 <span><b>${toBn(h.truckNo)}</b> - ${h.garden} (${toBn(h.date)})</span>
                 <div>
-                    <button style="background:#ca8a04; color:white; padding:4px 8px; border-radius:4px;" onclick="editHistory(${i})">Edit</button>
-                    <button style="background:#ef4444; color:white; padding:4px 8px; border-radius:4px;" onclick="deleteHistory(${i})">Del</button>
+                    <button style="background:#ca8a04; color:white; padding:4px 8px; border-radius:4px; border:none;" onclick="editHistory(${i})">Edit</button>
+                    <button style="background:#ef4444; color:white; padding:4px 8px; border-radius:4px; border:none;" onclick="deleteHistory(${i})">Del</button>
                 </div>
             </div>
         `).join('');
@@ -282,7 +294,6 @@
 
     function deleteHistory(index) { if (confirm('মুছে ফেলবেন?')) { historyLogs.splice(index, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
 
-    // ১৫ সেকেন্ড পরপর অটো সেভ
     setInterval(() => {
         localStorage.setItem('bfidc_records', JSON.stringify(records));
         const s = document.getElementById('autoSaveStatus');
