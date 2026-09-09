@@ -66,11 +66,11 @@
             </div>
             <div class="field">
                 <label>বেড় (ইঞ্চি):</label>
-                <input type="number" id="girth" placeholder="যেমন: 28" step="any" onkeydown="handleEnter(event, 'length')">
+                <input type="number" id="girth" placeholder="বেড়" step="any" onkeydown="handleEnter(event, 'length')">
             </div>
             <div class="field">
                 <label>লম্বা (ফুট):</label>
-                <input type="number" id="length" placeholder="যেমন: 6.66" step="any" onkeydown="handleEnterLength(event)">
+                <input type="number" id="length" placeholder="লম্বা" step="any" onkeydown="handleEnterLength(event)">
             </div>
         </div>
         <div class="btn-row">
@@ -119,7 +119,6 @@
     document.getElementById('gardenInput').value = garden;
     document.getElementById('gardenNameText').innerText = garden;
 
-    // এন্টার কি হ্যান্ডেল করা
     function handleEnter(e, nextId) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -127,7 +126,6 @@
         }
     }
 
-    // লম্বা লিখে এন্টার দিলে ডাটা যোগ হবে
     function handleEnterLength(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -141,6 +139,12 @@
         localStorage.setItem('bfidc_simple_garden', val);
     }
 
+    // দশমিকের পর ২ ঘর রাখা (কোনো রাউন্ডিং ছাড়াই)
+    function truncateToTwoDecimals(num) {
+        // ২.২৬৬২৫ কে ১০০ দিয়ে গুণ করলে ২২৬.৬২৫ হয়, ফ্লোর করলে ২২৬ হয়, তারপর ১০০ দিয়ে ভাগ করলে ২.২৬ হয়
+        return (Math.floor(num * 100) / 100).toFixed(2);
+    }
+
     function addNewSize() {
         const pNoField = document.getElementById('pieceNo');
         const girthField = document.getElementById('girth');
@@ -151,13 +155,13 @@
         const l = parseFloat(lengthField.value);
 
         if (!pNo || isNaN(g) || isNaN(l) || g <= 0 || l <= 0) {
-            alert('সঠিক মাপ ও গাছ/পিস নম্বর দিন!');
+            alert('সঠিক মাপ দিন!');
             return;
         }
 
-        // CFT Calculation: (Girth * Girth * Length) / 2304
+        // CFT Formula: (Girth * Girth * Length) / 2304
         const rawCft = (g * g * l) / 2304;
-        const formattedCft = rawCft.toFixed(2); // দশমিকের পর ২ ঘর
+        const formattedCft = truncateToTwoDecimals(rawCft);
 
         records.push({
             pNo: pNo,
@@ -165,18 +169,16 @@
             cft: formattedCft
         });
 
-        // পিস নম্বর অটো বাড়ানো (১/১ থেকে ১/২)
+        // পিস নম্বর বাড়ানো (১/১ -> ১/২)
         let parts = pNo.split('/');
         if (parts.length === 2 && !isNaN(parts[1])) {
-            let nextPiece = parseInt(parts[1]) + 1;
-            pNoField.value = parts[0] + '/' + nextPiece;
+            pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
         }
 
-        // ইনপুট ক্লিয়ার করা
         girthField.value = '';
         lengthField.value = '';
 
-        // লিস্টে যোগ হওয়ার পর কার্সর গাছ/পিস (pieceNo) বক্সে যাবে
+        // লিস্টে যোগ হওয়ার পর কার্সর গাছ/পিস বক্সে যাবে
         pNoField.focus();
 
         saveAndRender();
@@ -188,7 +190,7 @@
     }
 
     function clearList() {
-        if (records.length && confirm('সব সাইজ মুছে ফেলতে চান?')) {
+        if (records.length && confirm('সব মুছবেন?')) {
             records = [];
             saveAndRender();
             document.getElementById('pieceNo').value = '1/1';
@@ -197,17 +199,16 @@
 
     function saveAndRender() {
         localStorage.setItem('bfidc_simple_logs', JSON.stringify(records));
-        
         const tbody = document.getElementById('listBody');
         tbody.innerHTML = '';
 
         const treeSet = new Set();
-        let totalCftFloat = 0;
+        let totalCft = 0;
 
         records.forEach((item, idx) => {
             const rootTree = item.pNo.split('/')[0].trim();
             if (rootTree) treeSet.add(rootTree);
-            totalCftFloat += parseFloat(item.cft);
+            totalCft += parseFloat(item.cft);
 
             tbody.innerHTML += `
                 <tr>
@@ -221,55 +222,35 @@
 
         document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি';
         document.getElementById('dispTotalPieces').innerText = records.length + ' টি';
-        document.getElementById('dispTotalCFT').innerText = totalCftFloat.toFixed(2);
+        document.getElementById('dispTotalCFT').innerText = totalCft.toFixed(2);
     }
 
     function saveToWord() {
-        if (!records.length) {
-            alert('তালিকায় কোনো ডাটা নেই!');
-            return;
-        }
-
+        if (!records.length) return;
         const gardenName = document.getElementById('gardenNameText').innerText;
-        let totalCftFloat = 0;
         let rows = '';
-
         records.forEach(item => {
-            totalCftFloat += parseFloat(item.cft);
             rows += `<tr>
-                <td style="border:1px solid #000; text-align:center; padding:5px;">${item.pNo}</td>
-                <td style="border:1px solid #000; text-align:center; padding:5px;">${item.size}</td>
-                <td style="border:1px solid #000; text-align:center; padding:5px;">${item.cft}</td>
+                <td style="border:1px solid #000; text-align:center;">${item.pNo}</td>
+                <td style="border:1px solid #000; text-align:center;">${item.size}</td>
+                <td style="border:1px solid #000; text-align:center;">${item.cft}</td>
             </tr>`;
         });
 
-        const htmlDoc = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        const htmlDoc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head><meta charset='utf-8'></head>
             <body style="font-family:'Nikosh', Arial; text-align:center;">
-                <h2>BFIDC FINAL ERP</h2>
-                <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, ${gardenName} রাবার বাগান হতে বিএফআইডিসি, এলপিসি প্রেরণের সাইজ লিস্ট।</p>
+                <h2>BFIDC WOOD LIST</h2>
+                <p>বাগান: ${gardenName}</p>
                 <table style="width:100%; border-collapse:collapse;">
-                    <thead>
-                        <tr style="background:#eee;">
-                            <th style="border:1px solid #000; padding:6px;">গাছ/পিস</th>
-                            <th style="border:1px solid #000; padding:6px;">সাইজ</th>
-                            <th style="border:1px solid #000; padding:6px;">সিএফটি</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows}
-                        <tr><td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট সিএফটি:</td>
-                        <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${totalCftFloat.toFixed(2)}</td></tr>
-                    </tbody>
+                    <thead><tr style="background:#eee;"><th>গাছ/পিস</th><th>সাইজ</th><th>সিএফটি</th></tr></thead>
+                    <tbody>${rows}</tbody>
                 </table>
-            </body>
-            </html>`;
+            </body></html>`;
 
         const blob = new Blob(['\ufeff' + htmlDoc], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
+        a.href = URL.createObjectURL(blob);
         a.download = `Wood_List_${gardenName}.doc`;
         a.click();
     }
