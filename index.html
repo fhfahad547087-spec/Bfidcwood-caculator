@@ -10,7 +10,7 @@
             --primary: #1e3a2f;
             --primary-light: #2d5a46;
             --accent: #b45309;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #475569;
@@ -31,48 +31,53 @@
             background-color: var(--bg);
             color: var(--text-main);
             padding: 20px 10px;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
         }
 
         .container {
-            max-width: 1050px;
+            max-width: 950px;
             margin: 0 auto;
         }
 
-        /* হেডার */
+        /* অফিসিয়াল হেডার */
         header {
             background: #ffffff;
-            border: 2px solid #94a3b8;
-            padding: 22px;
-            border-radius: 6px;
+            border: 2px solid #0f172a;
+            padding: 20px;
+            border-radius: 4px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.04);
             margin-bottom: 20px;
         }
 
         header .erp-title {
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             font-weight: 800;
             color: #0f172a;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         header .sub-title {
-            font-size: 1.2rem;
-            color: #334155;
+            font-size: 1.25rem;
+            color: #1e293b;
             line-height: 1.6;
+        }
+
+        .garden-name-display {
+            font-weight: bold;
+            border-bottom: 1.5px dotted #0f172a;
+            padding: 0 4px;
+            color: #044e29;
         }
 
         .formula-badge {
             display: inline-block;
-            background: #f8fafc;
+            background: #f1f5f9;
             border: 1px dashed #64748b;
             padding: 3px 14px;
             margin-top: 10px;
             font-size: 1rem;
             font-weight: bold;
-            color: #0f172a;
         }
 
         .card {
@@ -114,7 +119,7 @@
         }
 
         .form-group label {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: bold;
             color: var(--text-muted);
             margin-bottom: 4px;
@@ -162,71 +167,44 @@
         .btn-danger { background-color: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
         .btn-danger:hover { background-color: #fecaca; }
 
-        /* মোট পরিসংখ্যান কার্ড */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 6px;
-            padding: 14px;
-            border: 1px solid var(--border);
-            text-align: center;
-            border-top: 4px solid var(--primary);
-        }
-
-        .stat-card.accent { border-top-color: var(--accent); }
-
-        .stat-title {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .stat-card.accent .stat-value { color: var(--accent); }
-
         /* টেবিল */
         .table-container {
             overflow-x: auto;
-            border: 1px solid #94a3b8;
+            border: 2px solid #0f172a;
             border-radius: 4px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             text-align: center;
             background: white;
         }
 
         thead tr {
-            background-color: #e2e8f0;
+            background-color: #f1f5f9;
             color: #0f172a;
-            border-bottom: 2px solid #94a3b8;
+            border-bottom: 2px solid #0f172a;
         }
 
         th, td {
-            padding: 8px 12px;
+            padding: 9px 12px;
             border: 1px solid #cbd5e1;
         }
 
-        tbody tr:nth-child(even) { background-color: #f8fafc; }
+        tbody tr:nth-child(even) { background-color: #fafbfc; }
 
         .cft-cell {
             font-weight: bold;
             color: var(--primary);
+        }
+
+        .total-summary-row td {
+            background-color: #f8fafc;
+            font-weight: bold;
+            border-top: 2px solid #0f172a;
+            font-size: 1.25rem;
         }
 
         .action-icon-btn {
@@ -250,29 +228,37 @@
 
         #backupFileInput { display: none; }
 
+        /* প্রিন্ট সেটআপ */
         @media print {
             body { background: white; padding: 0; }
-            .card, header { box-shadow: none; border: 1px solid #000; }
-            .form-section, .btn-group, .action-bar, .action-icon-btn, th:last-child, td:last-child { display: none !important; }
+            .container { max-width: 100%; width: 100%; }
+            .card, header { box-shadow: none; border: 1.5px solid #000; margin-bottom: 15px; }
+            .form-section, .btn-group, .action-bar, .action-icon-btn, th.action-col, td.action-col { 
+                display: none !important; 
+            }
+            .table-container { border: 1.5px solid #000; }
             table { border: 1px solid #000; width: 100%; }
             th, td { border: 1px solid #000; }
+            .total-summary-row td { border-top: 2px solid #000 !important; background: #fff !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- হেডার -->
     <header>
         <div class="erp-title">BFIDC FINAL ERP</div>
         <div class="sub-title">
-            বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-            প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[span_0](start_span)[span_0](end_span)
+            বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, <span id="displayGarden" class="garden-name-display">রাউজান</span> রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
+            প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।
         </div>
         <div class="formula-badge">
             সূত্র: (বেড়" × বেড়" × লম্বা') ÷ ২৩MD = সিএফটি (দশমিকের পর ২ ঘর)
         </div>
     </header>
 
+    <!-- ইনপুট ও সেটিংস ফর্ম -->
     <div class="card form-section">
         <div class="card-header">
             <div class="card-title" id="formHeaderTitle">নতুন সাইজ যোগ করুন</div>
@@ -282,8 +268,12 @@
             <input type="hidden" id="editId" value="">
             <div class="input-grid">
                 <div class="form-group">
+                    <label for="gardenName">বাগানের নাম</label>
+                    <input type="text" id="gardenName" placeholder="উদা: রাউজান / ডলু / মধুপুর" value="রাউজান" oninput="updateGardenName()">
+                </div>
+                <div class="form-group">
                     <label for="treeNo">গাছ/পিস নম্বর</label>
-                    <input type="text" id="treeNo" placeholder="উদা: 310/1" required autocomplete="off">
+                    <input type="text" id="treeNo" placeholder="উদা: 1/1 বা 310/1" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="girth">বেড় (ইঞ্চি - ")</label>
@@ -291,7 +281,7 @@
                 </div>
                 <div class="form-group">
                     <label for="length">লম্বা (ফুট - ')</label>
-                    <input type="number" id="length" step="any" placeholder="5" required>
+                    <input type="number" id="length" step="any" placeholder="6" required>
                 </div>
                 <div class="form-group">
                     <label for="cftPreview">হিসাবকৃত CFT</label>
@@ -305,22 +295,7 @@
         </form>
     </div>
 
-    <!-- মোট যোগফল প্রদর্শনী -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-title">মোট গাছ</div>
-            <div class="stat-value" id="totalTrees">0 টি</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">মোট পিস</div>
-            <div class="stat-value" id="totalPieces">0 টি</div>
-        </div>
-        <div class="stat-card accent">
-            <div class="stat-title">মোট সিএফটি (CFT)</div>
-            <div class="stat-value" id="totalCFT">0.00</div>
-        </div>
-    </div>
-
+    <!-- সাইজ তালিকা টেবিল -->
     <div class="card">
         <div class="card-header">
             <div class="card-title">কাঠের সাইজ তালিকা</div>
@@ -338,13 +313,30 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">গাছ/পিস</th>
+                        <th style="width: 150px;">গাছ/পিস</th>
                         <th>সাইজ</th>
-                        <th>সিএফটি</th>
-                        <th style="width: 100px;">অ্যাকশন</th>
+                        <th style="width: 150px;">সিএফটি</th>
+                        <th style="width: 90px;" class="action-col">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody id="logTableBody"></tbody>
+                <tfoot id="tableFooter">
+                    <tr class="total-summary-row">
+                        <td style="text-align: right; font-weight: bold;">মোট গাছ:</td>
+                        <td colspan="2" style="text-align: left; padding-left: 20px;" id="footTotalTrees">০ টি</td>
+                        <td class="action-col"></td>
+                    </tr>
+                    <tr class="total-summary-row">
+                        <td style="text-align: right; font-weight: bold;">মোট পিস:</td>
+                        <td colspan="2" style="text-align: left; padding-left: 20px;" id="footTotalPieces">০ টি</td>
+                        <td class="action-col"></td>
+                    </tr>
+                    <tr class="total-summary-row">
+                        <td style="text-align: right; font-weight: bold; color: var(--accent);">মোট সিএফটি:</td>
+                        <td colspan="2" style="text-align: left; padding-left: 20px; color: var(--accent);" id="footTotalCFT">0.00</td>
+                        <td class="action-col"></td>
+                    </tr>
+                </tfoot>
             </table>
             <div id="emptyState" class="empty-state">কোনো ডাটা পাওয়া যায়নি। উপরে মাপ লিখে যুক্ত করুন।</div>
         </div>
@@ -354,7 +346,10 @@
 <script>
     const FORMULA_DIVISOR = 2304;
     let logList = JSON.parse(localStorage.getItem('bfidc_wood_pro_data')) || [];
+    let savedGarden = localStorage.getItem('bfidc_garden_name') || 'রাউজান';
 
+    const gardenInput = document.getElementById('gardenName');
+    const displayGarden = document.getElementById('displayGarden');
     const girthInput = document.getElementById('girth');
     const lengthInput = document.getElementById('length');
     const cftPreview = document.getElementById('cftPreview');
@@ -364,7 +359,16 @@
     const formHeaderTitle = document.getElementById('formHeaderTitle');
     const editingBadge = document.getElementById('editingBadge');
 
-    // দশমিকের পর দুই ঘর রাউন্ডিং
+    // বাগানের নাম সেট
+    gardenInput.value = savedGarden;
+    displayGarden.textContent = savedGarden;
+
+    function updateGardenName() {
+        const val = gardenInput.value.trim() || '........................';
+        displayGarden.textContent = val;
+        localStorage.setItem('bfidc_garden_name', gardenInput.value.trim());
+    }
+
     function calculateCFT(girth, length) {
         if (!girth || !length || girth <= 0 || length <= 0) return 0;
         const val = (girth * girth * length) / FORMULA_DIVISOR;
@@ -415,7 +419,6 @@
                 cft: cft
             });
 
-            // পরের গাছের নম্বর অনুমান
             const parts = treeNo.split('/');
             if (parts.length === 2 && !isNaN(parts[1])) {
                 treeNoInput.value = `${parts[0]}/${parseInt(parts[1]) + 1}`;
@@ -474,55 +477,51 @@
     function saveAndRender() {
         localStorage.setItem('bfidc_wood_pro_data', JSON.stringify(logList));
         renderTable();
-        updateSummary();
     }
 
     function renderTable() {
         const tbody = document.getElementById('logTableBody');
         const emptyState = document.getElementById('emptyState');
+        const tfoot = document.getElementById('tableFooter');
         tbody.innerHTML = '';
 
         if (!logList.length) {
             emptyState.style.display = 'block';
+            tfoot.style.display = 'none';
             return;
         }
+
         emptyState.style.display = 'none';
+        tfoot.style.display = 'table-footer-group';
 
-        logList.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${item.treeNo}</strong></td>
-                <td>${item.sizeText}</td>
-                <td class="cft-cell">${item.cft}</td>
-                <td>
-                    <button class="action-icon-btn btn-edit-act" title="এডিট করুন" onclick="editRow(${item.id})">✏️</button>
-                    <button class="action-icon-btn btn-del-act" title="মুছুন" onclick="deleteRow(${item.id})">✕</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // নিখুঁত মোট হিসাব ফাংশন
-    function updateSummary() {
         const treeSet = new Set();
-        let totalCftCents = 0; // পয়সা বা সেন্ট আকারে যোগ করে ফ্লোট ইরর রোধ
+        let totalCftCents = 0;
 
         logList.forEach(item => {
-            // মূল গাছ আলাদা করার লজিক (310/1 -> 310, 310-1 -> 310)
             const rawTree = (item.treeNo || '').trim();
             const mainTree = rawTree.split(/[\/\-_]/)[0].trim();
             if (mainTree) treeSet.add(mainTree);
 
             const itemCft = parseFloat(item.cft) || 0;
             totalCftCents += Math.round(itemCft * 100);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${item.treeNo}</strong></td>
+                <td>${item.sizeText}</td>
+                <td class="cft-cell">${item.cft}</td>
+                <td class="action-col">
+                    <button class="action-icon-btn btn-edit-act" title="এডিট করুন" onclick="editRow(${item.id})">✏️</button>
+                    <button class="action-icon-btn btn-del-act" title="মুছুন" onclick="deleteRow(${item.id})">✕</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
 
         const finalTotalCFT = (totalCftCents / 100).toFixed(2);
-
-        document.getElementById('totalTrees').textContent = `${treeSet.size} টি`[span_1](start_span)[span_1](end_span);
-        document.getElementById('totalPieces').textContent = `${logList.length} টি`[span_2](start_span)[span_2](end_span);
-        document.getElementById('totalCFT').textContent = finalTotalCFT;
+        document.getElementById('footTotalTrees').textContent = `${treeSet.size} টি`[cite: 1];
+        document.getElementById('footTotalPieces').textContent = `${logList.length} টি`[cite: 1];
+        document.getElementById('footTotalCFT').textContent = finalTotalCFT;
     }
 
     function downloadBackup() {
@@ -530,10 +529,14 @@
             alert('ডাউনলোড করার মতো কোনো ডাটা নেই!');
             return;
         }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logList, null, 2));
+        const backupData = {
+            garden: gardenInput.value.trim(),
+            records: logList
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
         const a = document.createElement('a');
         a.setAttribute("href", dataStr);
-        a.setAttribute("download", `wood_records_backup_${new Date().toISOString().slice(0,10)}.json`);
+        a.setAttribute("download", `wood_backup_${new Date().toISOString().slice(0,10)}.json`);
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -546,14 +549,18 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const parsedData = JSON.parse(e.target.result);
-                if (Array.isArray(parsedData)) {
-                    logList = parsedData;
-                    saveAndRender();
-                    alert('সফলভাবে ব্যাকআপ ডাটা লোড হয়েছে!');
-                } else {
-                    alert('ভুল ফাইল ফরম্যাট!');
+                const parsed = JSON.parse(e.target.result);
+                if (Array.isArray(parsed)) {
+                    logList = parsed;
+                } else if (parsed.records && Array.isArray(parsed.records)) {
+                    logList = parsed.records;
+                    if (parsed.garden) {
+                        gardenInput.value = parsed.garden;
+                        updateGardenName();
+                    }
                 }
+                saveAndRender();
+                alert('সফলভাবে ব্যাকআপ লোড হয়েছে!');
             } catch (err) {
                 alert('ফাইলটি পড়া সম্ভব হয়নি!');
             }
@@ -568,6 +575,7 @@
             return;
         }
 
+        const currentGarden = gardenInput.value.trim() || '........................';
         const treeSet = new Set();
         let totalCftCents = 0;
         let rowsHtml = '';
@@ -599,14 +607,15 @@
                 <style>
                     body { font-family: 'Nikosh', Arial, sans-serif; }
                     table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-                    th { border: 1px solid #000; padding: 8px; background-color: #f2f2f2; }
+                    th { border: 1px solid #000; padding: 8px; background-color: #f2f2f2; text-align: center; }
+                    td { border: 1px solid #000; padding: 6px; text-align: center; }
                 </style>
             </head>
             <body>
                 <div style="text-align: center;">
                     <h2>BFIDC FINAL ERP</h2>
-                    <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-                    প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[span_3](start_span)[span_3](end_span)</p>
+                    <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, <b>${currentGarden}</b> রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
+                    প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[cite: 1]</p>
                 </div>
                 <table>
                     <thead>
@@ -619,16 +628,16 @@
                     <tbody>
                         ${rowsHtml}
                         <tr>
-                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট গাছ:</td>
-                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${treeSet.size} টি</td>
+                            <td style="font-weight: bold; text-align: right;">মোট গাছ:</td>
+                            <td colspan="2" style="font-weight: bold; text-align: left; padding-left: 20px;">${treeSet.size} টি</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট পিস:</td>
-                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${logList.length} টি</td>
+                            <td style="font-weight: bold; text-align: right;">মোট পিস:</td>
+                            <td colspan="2" style="font-weight: bold; text-align: left; padding-left: 20px;">${logList.length} টি</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট সিএফটি:</td>
-                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${finalTotalCFT}</td>
+                            <td style="font-weight: bold; text-align: right;">মোট সিএফটি:</td>
+                            <td colspan="2" style="font-weight: bold; text-align: left; padding-left: 20px;">${finalTotalCFT}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -640,7 +649,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `BFIDC_Wood_List_${new Date().toISOString().slice(0,10)}.doc`;
+        a.download = `BFIDC_${currentGarden}_Wood_List.doc`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -648,7 +657,6 @@
     }
 
     renderTable();
-    updateSummary();
 </script>
 
 </body>
