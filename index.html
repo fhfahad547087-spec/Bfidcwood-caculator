@@ -10,20 +10,18 @@
         body { background: #f1f5f9; padding: 15px; font-size: 18px; color: #000; }
         .wrapper { max-width: 850px; margin: 0 auto; background: #fff; padding: 25px; border: 1.5px solid #000; }
         
-        /* PDF এর মত অফিসিয়াল হেডার */
         .header-box { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 15px; }
         .header-box h2 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
         .header-box p { font-size: 19px; line-height: 1.4; }
         .garden-tag { font-weight: bold; text-decoration: underline; }
         
-        /* ইনপুট ফরম */
         .entry-box { background: #f8fafc; border: 1px solid #94a3b8; padding: 15px; margin-bottom: 20px; }
         .input-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
         .field { flex: 1; min-width: 140px; display: flex; flex-direction: column; }
         .field label { font-size: 16px; font-weight: bold; margin-bottom: 3px; }
         .field input { padding: 8px; font-size: 18px; border: 1px solid #64748b; border-radius: 3px; outline: none; }
+        .field input:focus { border-color: #1b4332; background: #fff; box-shadow: 0 0 4px rgba(27,67,50,0.4); }
         
-        /* বাটন */
         .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
         button { cursor: pointer; padding: 8px 14px; font-size: 17px; font-weight: bold; border-radius: 3px; border: 1px solid #333; }
         .btn-add { background: #1b4332; color: #fff; border: none; }
@@ -31,7 +29,6 @@
         .btn-print { background: #e2e8f0; }
         .btn-clear { background: #fee2e2; color: #b91c1c; border-color: #f87171; }
         
-        /* টেবিল */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1.5px solid #000; padding: 6px 10px; text-align: center; font-size: 19px; }
         th { background: #f1f5f9; font-weight: bold; }
@@ -55,28 +52,28 @@
         প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।</p>
     </div>
 
-    <!-- ডাটা ইনপুট -->
+    <!-- ইনপুট ফরম -->
     <div class="entry-box">
         <div class="input-row">
             <div class="field">
                 <label>বাগানের নাম:</label>
-                <input type="text" id="gardenInput" value="রাউজান" oninput="changeGarden()">
+                <input type="text" id="gardenInput" value="রাউজান" oninput="changeGarden()" onkeydown="handleEnter(event, 'pieceNo')">
             </div>
             <div class="field">
-                <label>গাছ/পিস (যেমন: 1/1):</label>
-                <input type="text" id="pieceNo" placeholder="1/1" autocomplete="off">
+                <label>গাছ/পিস:</label>
+                <input type="text" id="pieceNo" value="1/1" autocomplete="off" onkeydown="handleEnter(event, 'girth')">
             </div>
             <div class="field">
                 <label>বেড় (ইঞ্চি):</label>
-                <input type="number" id="girth" placeholder="30" step="any">
+                <input type="number" id="girth" placeholder="যেমন: 28" step="any" onkeydown="handleEnter(event, 'length')">
             </div>
             <div class="field">
                 <label>লম্বা (ফুট):</label>
-                <input type="number" id="length" placeholder="6" step="any">
+                <input type="number" id="length" placeholder="যেমন: 6.66" step="any" onkeydown="handleEnterLength(event)">
             </div>
         </div>
         <div class="btn-row">
-            <button class="btn-add" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
+            <button class="btn-add" id="addBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
             <button class="btn-word" onclick="saveToWord()">📄 Word ফাইল সেভ</button>
             <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
             <button class="btn-clear" onclick="clearList()">তালিকা মুছুন</button>
@@ -112,7 +109,6 @@
 </div>
 
 <script>
-    // লোকাল ডাটা
     let records = JSON.parse(localStorage.getItem('bfidc_simple_logs')) || [];
     let garden = localStorage.getItem('bfidc_simple_garden') || 'রাউজান';
 
@@ -125,6 +121,31 @@
         localStorage.setItem('bfidc_simple_garden', val);
     }
 
+    // অটো ফোকাস মুভ (Enter চাপলে)
+    function handleEnter(e, nextId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById(nextId).focus();
+        }
+    }
+
+    function handleEnterLength(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addNewSize();
+        }
+    }
+
+    // দশমিকের পর কোনো রাউন্ডিং ছাড়া সরাসরি ২ ঘর কাটার ফাংশন (2.26625 -> 2.26)
+    function truncateTo2Decimals(num) {
+        const str = num.toString();
+        if (str.indexOf('.') !== -1) {
+            const parts = str.split('.');
+            return parts[0] + '.' + parts[1].substring(0, 2).padEnd(2, '0');
+        }
+        return num.toFixed(2);
+    }
+
     function addNewSize() {
         const pNo = document.getElementById('pieceNo').value.trim();
         const g = parseFloat(document.getElementById('girth').value);
@@ -135,22 +156,23 @@
             return;
         }
 
-        // ফর্মুলা: (গার্থ^২ * দৈর্ঘ্য) / ২৩MD
-        const cft = ((g * g * l) / 2304);
-        const fixedCft = (Math.round((cft + Number.EPSILON) * 100) / 100).toFixed(2);
+        // ফর্মুলা: (গার্থ * গার্থ * দৈর্ঘ্য) / ২৩MD
+        const rawCft = (g * g * l) / 2304;
+        const exactCft = truncateTo2Decimals(rawCft);
 
         records.push({
             pNo: pNo,
             size: `${g}"×${l}'`,
-            cft: fixedCft
+            cft: exactCft
         });
 
-        // অটো পরের সিরিয়াল তৈরি
+        // অটো পরের সিরিয়াল তৈরি (1/1 -> 1/2)
         const splitted = pNo.split('/');
         if (splitted.length === 2 && !isNaN(splitted[1])) {
             document.getElementById('pieceNo').value = splitted[0] + '/' + (parseInt(splitted[1]) + 1);
         }
 
+        // ইনপুট খালি করে কার্সর সরাসরি আবার 'বেড়' ঘরে নিয়ে যাওয়া
         document.getElementById('girth').value = '';
         document.getElementById('length').value = '';
         document.getElementById('girth').focus();
@@ -167,6 +189,7 @@
         if (records.length && confirm('সব সাইজ মুছে ফেলতে চান?')) {
             records = [];
             saveAndRender();
+            document.getElementById('pieceNo').value = '1/1';
         }
     }
 
@@ -177,14 +200,13 @@
         tbody.innerHTML = '';
 
         const treeSet = new Set();
-        let totalPaisa = 0;
+        let totalCftFloat = 0;
 
         records.forEach((item, idx) => {
-            // মূল গাছ আলাদা করার হিসাব
             const rootTree = item.pNo.split(/[\/\-_]/)[0].trim();
             if (rootTree) treeSet.add(rootTree);
 
-            totalPaisa += Math.round(parseFloat(item.cft) * 100);
+            totalCftFloat += parseFloat(item.cft);
 
             tbody.innerHTML += `
                 <tr>
@@ -196,10 +218,9 @@
             `;
         });
 
-        // মোট হিসাব প্রদর্শন
         document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি';
         document.getElementById('dispTotalPieces').innerText = records.length + ' টি';
-        document.getElementById('dispTotalCFT').innerText = (totalPaisa / 100).toFixed(2);
+        document.getElementById('dispTotalCFT').innerText = totalCftFloat.toFixed(2);
     }
 
     function saveToWord() {
@@ -210,13 +231,13 @@
 
         const gardenName = document.getElementById('gardenNameText').innerText;
         const treeSet = new Set();
-        let totalPaisa = 0;
+        let totalCftFloat = 0;
         let rows = '';
 
         records.forEach(item => {
             const rootTree = item.pNo.split(/[\/\-_]/)[0].trim();
             if (rootTree) treeSet.add(rootTree);
-            totalPaisa += Math.round(parseFloat(item.cft) * 100);
+            totalCftFloat += parseFloat(item.cft);
 
             rows += `<tr>
                 <td style="border:1px solid #000; text-align:center; padding:5px;">${item.pNo}</td>
@@ -224,8 +245,6 @@
                 <td style="border:1px solid #000; text-align:center; padding:5px;">${item.cft}</td>
             </tr>`;
         });
-
-        const totalCFT = (totalPaisa / 100).toFixed(2);
 
         const htmlDoc = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -254,7 +273,7 @@
                         </tr>
                         <tr>
                             <td colspan="2" style="border:1px solid #000; text-align:right; font-weight:bold; padding:6px;">মোট সিএফটি:</td>
-                            <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${totalCFT}</td>
+                            <td style="border:1px solid #000; text-align:left; font-weight:bold; padding:6px;">${totalCftFloat.toFixed(2)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -268,6 +287,7 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
+        URL.revokeObjectURL(url);
     }
 
     saveAndRender();
