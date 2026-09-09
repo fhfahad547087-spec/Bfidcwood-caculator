@@ -39,7 +39,8 @@
         @media print {
             body { padding: 0; background: #fff; }
             .wrapper { border: none; padding: 0; width: 100%; }
-            .entry-box, .btn-row, .del-btn, th:last-child, td:last-child { display: none !important; }
+            .entry-box, .btn-row, .del-col { display: none !important; }
+            th, td { border: 1px solid #000 !important; }
         }
     </style>
 </head>
@@ -85,24 +86,27 @@
         <thead>
             <tr>
                 <th style="width: 25%;">গাছ/পিস</th>
-                <th style="width: 35%;">সাইজ</th>
+                <th style="width: 40%;">সাইজ</th>
                 <th style="width: 25%;">সিএফটি</th>
-                <th style="width: 15%;">মুছুন</th>
+                <th style="width: 10%;" class="del-col">মুছুন</th>
             </tr>
         </thead>
         <tbody id="listBody"></tbody>
         <tfoot>
             <tr>
-                <td colspan="2" class="total-title">মোট গাছ:</td>
-                <td colspan="2" class="total-val" id="dispTotalTrees">০ টি</td>
+                <td class="total-title" colspan="2">মোট গাছ:</td>
+                <td class="total-val" id="dispTotalTrees">০ টি</td>
+                <td class="del-col"></td>
             </tr>
             <tr>
-                <td colspan="2" class="total-title">মোট পিস:</td>
-                <td colspan="2" class="total-val" id="dispTotalPieces">০ টি</td>
+                <td class="total-title" colspan="2">মোট পিস:</td>
+                <td class="total-val" id="dispTotalPieces">০ টি</td>
+                <td class="del-col"></td>
             </tr>
             <tr>
-                <td colspan="2" class="total-title">মোট সিএফটি:</td>
-                <td colspan="2" class="total-val" id="dispTotalCFT">0.00</td>
+                <td class="total-title" colspan="2">মোট সিএফটি:</td>
+                <td class="total-val" id="dispTotalCFT">0.00</td>
+                <td class="del-col"></td>
             </tr>
         </tfoot>
     </table>
@@ -121,7 +125,6 @@
         localStorage.setItem('bfidc_simple_garden', val);
     }
 
-    // অটো ফোকাস মুভ (Enter চাপলে)
     function handleEnter(e, nextId) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -136,7 +139,6 @@
         }
     }
 
-    // দশমিকের পর কোনো রাউন্ডিং ছাড়া সরাসরি ২ ঘর কাটার ফাংশন (2.26625 -> 2.26)
     function truncateTo2Decimals(num) {
         const str = num.toString();
         if (str.indexOf('.') !== -1) {
@@ -156,7 +158,6 @@
             return;
         }
 
-        // ফর্মুলা: (গার্থ * গার্থ * দৈর্ঘ্য) / ২৩MD
         const rawCft = (g * g * l) / 2304;
         const exactCft = truncateTo2Decimals(rawCft);
 
@@ -166,13 +167,11 @@
             cft: exactCft
         });
 
-        // অটো পরের সিরিয়াল তৈরি (1/1 -> 1/2)
         const splitted = pNo.split('/');
         if (splitted.length === 2 && !isNaN(splitted[1])) {
             document.getElementById('pieceNo').value = splitted[0] + '/' + (parseInt(splitted[1]) + 1);
         }
 
-        // ইনপুট খালি করে কার্সর সরাসরি আবার 'বেড়' ঘরে নিয়ে যাওয়া
         document.getElementById('girth').value = '';
         document.getElementById('length').value = '';
         document.getElementById('girth').focus();
@@ -213,13 +212,13 @@
                     <td>${item.pNo}</td>
                     <td>${item.size}</td>
                     <td><b>${item.cft}</b></td>
-                    <td><button class="del-btn" onclick="removeRow(${idx})">✕</button></td>
+                    <td class="del-col"><button class="del-btn" onclick="removeRow(${idx})">✕</button></td>
                 </tr>
             `;
         });
 
-        document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি';
-        document.getElementById('dispTotalPieces').innerText = records.length + ' টি';
+        document.getElementById('dispTotalTrees').innerText = treeSet.size + ' টি'[cite: 1];
+        document.getElementById('dispTotalPieces').innerText = records.length + ' টি'[cite: 1];
         document.getElementById('dispTotalCFT').innerText = totalCftFloat.toFixed(2);
     }
 
@@ -252,7 +251,7 @@
             <body style="font-family:'Nikosh', Arial; text-align:center;">
                 <h2>BFIDC FINAL ERP</h2>
                 <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, <b>${gardenName}</b> রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-                প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।</p>
+                প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[cite: 1]</p>
                 <table style="width:100%; border-collapse:collapse; margin-top:10px;">
                     <thead>
                         <tr style="background:#eee;">
