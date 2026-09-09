@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - WORD EDITABLE</title>
+    <title>BFIDC WOOD ERP - FINAL VERSION</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
@@ -23,10 +23,10 @@
         button { cursor: pointer; padding: 10px 15px; font-weight: bold; border-radius: 5px; border: none; font-size: 14px; flex-grow: 1; }
         .btn-add { background: #1b4332; color: white; }
         .btn-update { background: #ca8a04 !important; color: white; }
-        .btn-word { background: #2b5797; color: white; } /* Word blue */
+        .btn-word { background: #2b5797; color: white; }
         .btn-print { background: #333; color: white; }
 
-        /* A4 Layout & Watermark */
+        /* A4 Layout & Multi-page Watermark */
         .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
         .wrapper { 
             width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 15mm; 
@@ -53,7 +53,7 @@
 
         .summary-container { margin-top: 10px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 5px; }
         .totals-footer { font-weight: bold; font-size: 17px; }
-        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; }
+        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; color: #1b4332; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
@@ -67,32 +67,38 @@
 <body>
 
 <div class="input-panel">
+    <!-- Header Inputs -->
     <div class="input-row">
         <div class="field"><label>বাগানের নাম:</label><input type="text" id="gardenInput" value="দাঁতমারা" oninput="updateHeader()"></div>
         <div class="field"><label>সূত্র:</label><input type="text" id="sutraInput" oninput="updateHeader()"></div>
         <div class="field"><label>তারিখ:</label><input type="text" id="dateInput" oninput="updateHeader()"></div>
         <div class="field"><label>ট্রাক নং:</label><input type="text" id="truckInput" oninput="updateHeader()"></div>
     </div>
+    <!-- Data Inputs -->
     <div class="input-row">
         <div class="field"><label>গাছের নম্বর/পিস:</label><input type="text" id="pieceNo" value="1/1" onkeydown="handleEnter(event, 'girth')"></div>
         <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="বেড়" onkeydown="handleEnter(event, 'length')"></div>
         <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="লম্বা" onkeydown="handleEnterLength(event)"></div>
     </div>
+    <!-- Buttons -->
     <div class="btn-group">
         <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
         <button class="btn-word" onclick="exportToWord()">📄 Word ফাইল সেভ</button>
         <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
-        <button class="btn-open" onclick="document.getElementById('fileOpener').click()">📂 ফাইল ওপেন (JSON)</button>
-        <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 আর্কাইভ</button>
+        <button class="btn-add" style="background:#0891b2" onclick="document.getElementById('fileOpener').click()">📂 ফাইল ওপেন</button>
+        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 JSON সেভ</button>
+        <button style="background:#333; color:white" onclick="archiveTruck()">🚚 আর্কাইভ</button>
         <button style="background:#d90429; color:white" onclick="clearCurrent()">মুছুন</button>
         <input type="file" id="fileOpener" style="display:none" accept=".json" onchange="openDataFile(event)">
     </div>
-    <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:10px; text-align:center;">অটো সেভ সচল...</div>
+    <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:10px; text-align:center;">অটো সেভ সক্রিয়...</div>
 </div>
 
 <div class="preview-container">
     <div class="wrapper" id="printArea">
+        <!-- Logo Watermark from GitHub -->
         <img src="logo.png" class="watermark" alt="Logo">
+        
         <div class="header-section">
             <h2 id="mainTitle">বিএফআইডিসি, দাঁতমারা রাবার বাগান হতে বিএফআইডিসি, এলপিসি, কাপ্তাই প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট</h2>
         </div>
@@ -114,7 +120,7 @@
         </table>
         <div class="summary-container">
             <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
-            <div class="in-words" id="inWordsText">কথায়: শূন্য ঘনফুট মাত্র।</div>
+            <div class="in-words" id="inWordsText">কথায়: শূণ্য টি গাছে শূণ্য টি টুকরা সমান শূণ্য দশমিক শূণ্য ঘনফুট।</div>
         </div>
     </div>
 </div>
@@ -129,10 +135,50 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
+    // Number to Bengali digits
     function toBn(n) {
         if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
         return n.toString().split('').map(char => bn[char] || char).join('');
+    }
+
+    // Number to Bengali Words
+    function toBnWord(n) {
+        const words = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়", "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ", "বিশ", "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আটাশ", "ঊনত্রিশ", "ত্রিশ", "একত্রিশ", "বত্রিশ", "তেত্রিশ", "চৌত্রিশ", "পঁয়ত্রিশ", "ছত্রিশ", "সাঁইত্রিশ", "আটত্রিশ", "ঊনচল্লিশ", "চল্লিশ", "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চুয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আটচল্লিশ", "ঊনপঞ্চাশ", "পঞ্চাশ"];
+        
+        let num = parseInt(n);
+        if (num <= 50) return words[num];
+        
+        // Simple fallback for higher numbers
+        return toBn(num);
+    }
+
+    // Full In Words logic
+    function convertToFullWords(trees, pieces, cft) {
+        let treeWords = treeSetToWords(trees);
+        let pieceWords = treeSetToWords(pieces);
+        let cftParts = cft.toString().split('.');
+        let cftInt = treeSetToWords(cftParts[0]);
+        let cftDec = treeSetToWords(cftParts[1] || "00");
+
+        return `কথায়: ${treeWords} টি গাছে ${pieceWords} টি টুকরা সমান ${cftInt} দশমিক ${cftDec} ঘনফুট।`;
+    }
+
+    // Basic Bengali word converter for numbers up to 999
+    function treeSetToWords(n) {
+        const unit = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
+        const teen = ["দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ"];
+        const tens = ["", "", "বিশ", "ত্রিশ", "চল্লিশ", "পঞ্চাশ", "ষাট", "সত্তুর", "আশি", "নব্বই"];
+        
+        let num = parseInt(n);
+        if (num === 0) return "শূণ্য";
+        let str = "";
+        
+        if (num >= 100) { str += unit[Math.floor(num/100)] + " শত "; num %= 100; }
+        if (num >= 20) { str += tens[Math.floor(num/10)] + " "; num %= 10; str += unit[num]; }
+        else if (num >= 10) { str += teen[num-10]; }
+        else { str += unit[num]; }
+        return str.trim();
     }
 
     function handleEnter(e, nextId) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById(nextId).focus(); } }
@@ -177,7 +223,9 @@
         records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
         const totalStr = totalCft.toFixed(2);
         document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalStr)}`;
-        document.getElementById('inWordsText').innerText = "কথায়: " + toBn(totalStr.split('.')[0]) + " দশমিক " + toBn(totalStr.split('.')[1]) + " ঘনফুট মাত্র।";
+        
+        // Update In Words Text
+        document.getElementById('inWordsText').innerText = convertToFullWords(treeSet.size, records.length, totalStr);
         renderHistory();
     }
 
@@ -210,7 +258,6 @@
 
     function deleteHistory(idx) { if(confirm('ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
 
-    // Export to Editable Microsoft Word
     function exportToWord() {
         const header = document.getElementById('mainTitle').innerText;
         const sutra = document.getElementById('sutraLabel').innerText;
@@ -265,7 +312,6 @@
         link.click();
     }
 
-    // JSON Open/Save
     function saveDataFile() {
         const data = { garden: document.getElementById('gardenInput').value, sutra: document.getElementById('sutraInput').value, date: document.getElementById('dateInput').value, truck: document.getElementById('truckInput').value, records: records };
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -273,11 +319,12 @@
     }
 
     function openDataFile(e) {
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader(); reader.onload = function(ev) {
             const data = JSON.parse(ev.target.result);
             document.getElementById('sutraInput').value = data.sutra || ''; document.getElementById('dateInput').value = data.date || ''; document.getElementById('truckInput').value = data.truck || '';
             records = data.records || []; updateHeader(); saveAndRender();
-        }; reader.readAsText(e.target.files[0]);
+        }; reader.readAsText(file);
     }
 
     setInterval(() => { localStorage.setItem('bfidc_records', JSON.stringify(records)); document.getElementById('autoSaveStatus').innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString()); }, 15000);
