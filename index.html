@@ -75,7 +75,6 @@
             color: #0f172a;
         }
 
-        /* কার্ড কাঠামো */
         .card {
             background: var(--card-bg);
             border-radius: 6px;
@@ -102,7 +101,6 @@
             color: var(--primary);
         }
 
-        /* ফর্ম */
         .input-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -164,7 +162,7 @@
         .btn-danger { background-color: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
         .btn-danger:hover { background-color: #fecaca; }
 
-        /* স্ট্যাটাস কার্ড */
+        /* মোট পরিসংখ্যান কার্ড */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -264,7 +262,6 @@
 <body>
 
 <div class="container">
-    <!-- অফিশিয়াল হেডার -->
     <header>
         <div class="erp-title">BFIDC FINAL ERP</div>
         <div class="sub-title">
@@ -276,7 +273,6 @@
         </div>
     </header>
 
-    <!-- ডাটা এন্ট্রি / এডিট ফর্ম -->
     <div class="card form-section">
         <div class="card-header">
             <div class="card-title" id="formHeaderTitle">নতুন সাইজ যোগ করুন</div>
@@ -309,7 +305,7 @@
         </form>
     </div>
 
-    <!-- মোট পরিসংখ্যান -->
+    <!-- মোট যোগফল প্রদর্শনী -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-title">মোট গাছ</div>
@@ -325,7 +321,6 @@
         </div>
     </div>
 
-    <!-- টেবিল ও ব্যাকআপ/এক্সপোর্ট টুলস -->
     <div class="card">
         <div class="card-header">
             <div class="card-title">কাঠের সাইজ তালিকা</div>
@@ -343,7 +338,7 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">গাছ/পিস</th>
+                        <th style="width: 80px;">গাছ/পিস</th>
                         <th>সাইজ</th>
                         <th>সিএফটি</th>
                         <th style="width: 100px;">অ্যাকশন</th>
@@ -369,10 +364,11 @@
     const formHeaderTitle = document.getElementById('formHeaderTitle');
     const editingBadge = document.getElementById('editingBadge');
 
+    // দশমিকের পর দুই ঘর রাউন্ডিং
     function calculateCFT(girth, length) {
         if (!girth || !length || girth <= 0 || length <= 0) return 0;
         const val = (girth * girth * length) / FORMULA_DIVISOR;
-        return Math.round(val * 100) / 100;
+        return (Math.round((val + Number.EPSILON) * 100) / 100);
     }
 
     function updatePreview() {
@@ -400,7 +396,6 @@
         const cft = calculateCFT(girth, length).toFixed(2);
 
         if (editId) {
-            // এডিট আপডেট
             const index = logList.findIndex(item => item.id == editId);
             if (index !== -1) {
                 logList[index].treeNo = treeNo;
@@ -411,7 +406,6 @@
             }
             resetForm();
         } else {
-            // নতুন যোগ
             logList.push({
                 id: Date.now(),
                 treeNo: treeNo,
@@ -421,7 +415,7 @@
                 cft: cft
             });
 
-            // পরের সিরিয়াল প্রেডিকশন
+            // পরের গাছের নম্বর অনুমান
             const parts = treeNo.split('/');
             if (parts.length === 2 && !isNaN(parts[1])) {
                 treeNoInput.value = `${parts[0]}/${parseInt(parts[1]) + 1}`;
@@ -446,7 +440,6 @@
         cftPreview.value = item.cft;
 
         submitBtn.textContent = 'আপডেট করুন';
-        submitBtn.className = 'btn-primary';
         formHeaderTitle.textContent = 'তথ্য সংশোধন (Edit)';
         editingBadge.style.display = 'inline';
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -472,7 +465,7 @@
     }
 
     function clearAllData() {
-        if (logList.length && confirm('সতর্কতা: পুরো তালিকা মুছে ফেলতে চান?')) {
+        if (logList.length && confirm('পুরো তালিকা মুছে ফেলতে চান?')) {
             logList = [];
             saveAndRender();
         }
@@ -510,21 +503,28 @@
         });
     }
 
+    // নিখুঁত মোট হিসাব ফাংশন
     function updateSummary() {
         const treeSet = new Set();
-        let totalCFT = 0;
+        let totalCftCents = 0; // পয়সা বা সেন্ট আকারে যোগ করে ফ্লোট ইরর রোধ
 
         logList.forEach(item => {
-            treeSet.add(item.treeNo.split('/')[0]);
-            totalCFT += parseFloat(item.cft) || 0;
+            // মূল গাছ আলাদা করার লজিক (310/1 -> 310, 310-1 -> 310)
+            const rawTree = (item.treeNo || '').trim();
+            const mainTree = rawTree.split(/[\/\-_]/)[0].trim();
+            if (mainTree) treeSet.add(mainTree);
+
+            const itemCft = parseFloat(item.cft) || 0;
+            totalCftCents += Math.round(itemCft * 100);
         });
+
+        const finalTotalCFT = (totalCftCents / 100).toFixed(2);
 
         document.getElementById('totalTrees').textContent = `${treeSet.size} টি`[span_1](start_span)[span_1](end_span);
         document.getElementById('totalPieces').textContent = `${logList.length} টি`[span_2](start_span)[span_2](end_span);
-        document.getElementById('totalCFT').textContent = totalCFT.toFixed(2);
+        document.getElementById('totalCFT').textContent = finalTotalCFT;
     }
 
-    // ব্যাকআপ ডাউনলোড (JSON Save)
     function downloadBackup() {
         if (!logList.length) {
             alert('ডাউনলোড করার মতো কোনো ডাটা নেই!');
@@ -539,7 +539,6 @@
         a.remove();
     }
 
-    // ব্যাকআপ ফাইল রিস্টোর (JSON Restore)
     function restoreBackup(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -563,7 +562,6 @@
         event.target.value = '';
     }
 
-    // Word ফাইল (.doc) এক্সপোর্ট
     function exportToWord() {
         if (!logList.length) {
             alert('তালিকায় কোনো ডাটা নেই!');
@@ -571,12 +569,17 @@
         }
 
         const treeSet = new Set();
-        let totalCFT = 0;
+        let totalCftCents = 0;
         let rowsHtml = '';
 
         logList.forEach(item => {
-            treeSet.add(item.treeNo.split('/')[0]);
-            totalCFT += parseFloat(item.cft) || 0;
+            const rawTree = (item.treeNo || '').trim();
+            const mainTree = rawTree.split(/[\/\-_]/)[0].trim();
+            if (mainTree) treeSet.add(mainTree);
+
+            const itemCft = parseFloat(item.cft) || 0;
+            totalCftCents += Math.round(itemCft * 100);
+
             rowsHtml += `
                 <tr>
                     <td style="border: 1px solid #000; padding: 6px; text-align: center;">${item.treeNo}</td>
@@ -585,6 +588,8 @@
                 </tr>
             `;
         });
+
+        const finalTotalCFT = (totalCftCents / 100).toFixed(2);
 
         const wordContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -601,7 +606,7 @@
                 <div style="text-align: center;">
                     <h2>BFIDC FINAL ERP</h2>
                     <p>বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
-                    প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।</p>
+                    প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।[span_3](start_span)[span_3](end_span)</p>
                 </div>
                 <table>
                     <thead>
@@ -623,7 +628,7 @@
                         </tr>
                         <tr>
                             <td colspan="2" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: right;">মোট সিএফটি:</td>
-                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${totalCFT.toFixed(2)}</td>
+                            <td style="border: 1px solid #000; padding: 6px; font-weight: bold; text-align: center;">${finalTotalCFT}</td>
                         </tr>
                     </tbody>
                 </table>
