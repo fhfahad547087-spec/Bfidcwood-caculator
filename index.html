@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - EDITABLE HISTORY</title>
+    <title>BFIDC WOOD ERP - FINAL VERSION</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
@@ -21,13 +21,14 @@
             overflow: hidden;
         }
 
+        /* Watermark Logo Adjust */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
-            opacity: 0.12;
+            width: 80%; /* এ৪ সাইজের সাথে সামঞ্জস্যপূর্ণ */
+            opacity: 0.1; /* ২৫% এর বদলে আরও আবছা করা হয়েছে টেক্সট বোঝার জন্য */
             z-index: 0;
             pointer-events: none;
         }
@@ -39,7 +40,7 @@
         .meta-info div { flex: 1; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; background: transparent; }
-        th, td { border: 1px solid #000; padding: 4px 2px; text-align: center; font-size: 14px; }
+        th, td { border: 1px solid #000; padding: 4px 2px; text-align: center; font-size: 15px; }
         th { background: #e2e2e2; font-weight: bold; }
 
         /* Input Panel */
@@ -60,22 +61,24 @@
         .btn-print { background: #333; color: white; }
         .btn-clear { background: #d90429; color: white; }
 
-        /* History UI */
+        /* Actions in Table */
+        .action-btns { display: flex; justify-content: center; gap: 4px; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 10px; padding: 2px 4px; border-radius: 2px; }
+        .del-btn { background: #ef4444; color: white; font-size: 10px; padding: 2px 4px; border-radius: 2px; }
+
+        /* History */
         .history-section { max-width: 950px; margin: 20px auto; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #94a3b8; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        .btn-edit { background: #ca8a04; color: white; padding: 5px 10px; font-size: 12px; }
-        .btn-del-hist { background: #ef4444; color: white; padding: 5px 10px; font-size: 12px; margin-left: 5px; }
 
         .totals-footer { margin-top: 20px; font-weight: bold; font-size: 18px; border-top: 2px solid #000; padding-top: 10px; position: relative; z-index: 1; }
         #autoSaveStatus { font-size: 12px; color: green; font-weight: bold; margin-top: 5px; }
 
         @media print {
-            .input-panel, .history-section, .del-btn, #autoSaveStatus { display: none !important; }
+            .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
             body { background: none; padding: 0; }
             .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; }
             @page { size: A4; margin: 0; }
         }
-        .del-btn { background: none; border: none; color: red; cursor: pointer; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -89,13 +92,13 @@
     </div>
     <div class="input-row">
         <div class="field"><label>গাছের নম্বর/পিস:</label><input type="text" id="pieceNo" value="1/1" onkeydown="handleEnter(event, 'girth')"></div>
-        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="number" id="girth" step="any" onkeydown="handleEnter(event, 'length')"></div>
-        <div class="field"><label>লম্বা (ফুট):</label><input type="number" id="length" step="any" onkeydown="handleEnterLength(event)"></div>
+        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="বেড়" onkeydown="handleEnter(event, 'length')"></div>
+        <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="লম্বা" onkeydown="handleEnterLength(event)"></div>
     </div>
     <div class="btn-group">
         <button class="btn-add" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
-        <button class="btn-new-truck" onclick="archiveTruck()">🚚 নতুন ট্রাক শুরু (Archive)</button>
-        <button class="btn-save" onclick="saveDataFile()">💾 JSON ডাউনলোড</button>
+        <button class="btn-new-truck" onclick="archiveTruck()">🚚 ট্রাক আর্কাইভ (নতুন ট্রাক)</button>
+        <button class="btn-save" onclick="saveDataFile()">💾 JSON ব্যাকআপ</button>
         <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট করুন</button>
         <button class="btn-clear" onclick="clearCurrent()">তালিকা ক্লিয়ার</button>
     </div>
@@ -103,7 +106,9 @@
 </div>
 
 <div class="wrapper">
-    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Bangladesh_Forest_Industries_Development_Corporation_logo.svg/1024px-Bangladesh_Forest_Industries_Development_Corporation_logo.svg.png" class="watermark">
+    <!-- Logo Watermark from GitHub -->
+    <img src="logo.png" class="watermark" alt="BFIDC Logo">
+
     <div class="header-section">
         <h2>বিএফআইডিসি, <span id="gardenLabel">দাঁতমারা</span> রাবার বাগানের জীবনচক্র হারানো রাবার গাছের পরিমাপকৃত সাইজ লিস্ট</h2>
     </div>
@@ -115,9 +120,9 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 7%;">ক্রমিক</th><th style="width: 13%;">গাছের নম্বর</th><th style="width: 14%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                <th style="width: 7%;">ক্রমিক</th><th style="width: 13%;">গাছের নম্বর</th><th style="width: 14%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                <th style="width: 12%;">মন্তব্য</th>
+                <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
+                <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
+                <th style="width: 6%;" class="action-btns">এডিট</th>
             </tr>
         </thead>
         <tbody id="dataTableBody"></tbody>
@@ -126,13 +131,20 @@
 </div>
 
 <div class="history-section">
-    <h3 style="border-bottom: 2px solid #333; margin-bottom: 10px;">📜 History (সংরক্ষিত ট্রাক সমুহ)</h3>
+    <h3 style="border-bottom: 2px solid #333; margin-bottom: 10px;">📜 History (সংরক্ষিত ট্রাক সমূহ)</h3>
     <div id="historyList"></div>
 </div>
 
 <script>
     let records = JSON.parse(localStorage.getItem('bfidc_records')) || [];
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
+
+    // ইংরেজি থেকে বাংলা নাম্বার কনভার্টার
+    function toBn(n) {
+        if (n === null || n === undefined) return '';
+        const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
+        return n.toString().split('').map(char => bn[char] || char).join('');
+    }
 
     function handleEnter(e, nextId) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById(nextId).focus(); } }
     function handleEnterLength(e) { if (e.key === 'Enter') { e.preventDefault(); addNewSize(); } }
@@ -148,18 +160,31 @@
 
     function addNewSize() {
         const pNoField = document.getElementById('pieceNo');
-        const g = parseFloat(document.getElementById('girth').value);
-        const l = parseFloat(document.getElementById('length').value);
+        const gVal = document.getElementById('girth').value;
+        const lVal = document.getElementById('length').value;
+        
+        const g = parseFloat(gVal);
+        const l = parseFloat(lVal);
+
         if (!pNoField.value || isNaN(g) || isNaN(l)) return alert('সঠিক মাপ দিন');
 
         const formattedCft = truncateToTwoDecimals((g * g * l) / 2304);
-        records.push({ pNo: pNoField.value, size: `${g}"×${l}'`, cft: formattedCft });
+        
+        // লিস্টে ডাটা যোগ
+        records.push({ 
+            pNo: pNoField.value, 
+            gVal: g, 
+            lVal: l, 
+            size: `${g}"×${l}'`, 
+            cft: formattedCft 
+        });
 
-        // পরবর্তী পিস নম্বর অটো বাড়ানো
+        // অটো ইনক্রিমেন্ট ১/১ -> ১/২
         let parts = pNoField.value.split('/');
         if (parts.length === 2 && !isNaN(parts[1])) {
             pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
         }
+        
         document.getElementById('girth').value = '';
         document.getElementById('length').value = '';
         pNoField.focus();
@@ -176,23 +201,44 @@
         for (let i = 0; i < rowCount; i++) {
             const left = records[i] || null;
             const right = records[i + rowCount] || null;
+            
             tbody.innerHTML += `<tr>
-                <td>${left ? (i + 1) : ''} ${left ? `<button class="del-btn" onclick="removeRow(${i})">×</button>` : ''}</td>
-                <td>${left ? left.pNo : ''}</td><td>${left ? left.size : ''}</td><td>${left ? left.cft : ''}</td>
-                <td>${right ? (i + rowCount + 1) : ''} ${right ? `<button class="del-btn" onclick="removeRow(${i+rowCount})">×</button>` : ''}</td>
-                <td>${right ? right.pNo : ''}</td><td>${right ? right.size : ''}</td><td>${right ? right.cft : ''}</td>
-                <td></td>
+                <td>${left ? toBn(i + 1) : ''}</td>
+                <td>${left ? toBn(left.pNo) : ''}</td>
+                <td>${left ? toBn(left.size) : ''}</td>
+                <td>${left ? toBn(left.cft) : ''}</td>
+                <td>${right ? toBn(i + rowCount + 1) : ''}</td>
+                <td>${right ? toBn(right.pNo) : ''}</td>
+                <td>${right ? toBn(right.size) : ''}</td>
+                <td>${right ? toBn(right.cft) : ''}</td>
+                <td class="action-btns">
+                    ${left ? `<button class="edit-btn" onclick="editRow(${i})">E</button><button class="del-btn" onclick="removeRow(${i})">X</button>` : ''}
+                    ${right ? ` | <button class="edit-btn" onclick="editRow(${i + rowCount})">E</button>` : ''}
+                </td>
             </tr>`;
         }
-        records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
-        document.getElementById('summaryText').innerText = `${treeSet.size} টি গাছের ${records.length} টি পিস = মোট ঘনফুট: ${totalCft.toFixed(2)}`;
+        records.forEach(r => { 
+            totalCft += parseFloat(r.cft); 
+            treeSet.add(r.pNo.split('/')[0]); 
+        });
+        document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalCft.toFixed(2))}`;
         renderHistory();
     }
 
-    function removeRow(idx) { records.splice(idx, 1); saveAndRender(); }
-    function clearCurrent() { if (confirm('তালিকা মুছবেন?')) { records = []; saveAndRender(); } }
+    // সারি এডিট করার ফাংশন
+    function editRow(idx) {
+        const item = records[idx];
+        document.getElementById('pieceNo').value = item.pNo;
+        document.getElementById('girth').value = item.gVal;
+        document.getElementById('length').value = item.lVal;
+        records.splice(idx, 1); // সংশোধন করার জন্য আগেরটি ডিলিট করে ইনপুটে নেওয়া
+        saveAndRender();
+        document.getElementById('girth').focus();
+    }
 
-    // ট্রাক আর্কাইভ করা (নতুন ট্রাক শুরু)
+    function removeRow(idx) { if(confirm('ডিলিট করবেন?')) { records.splice(idx, 1); saveAndRender(); } }
+    function clearCurrent() { if (confirm('সব মুছবেন?')) { records = []; saveAndRender(); } }
+
     function archiveTruck() {
         if (records.length === 0) return alert('কোনো ডাটা নেই!');
         const truck = {
@@ -204,10 +250,8 @@
         };
         historyLogs.push(truck);
         localStorage.setItem('bfidc_history', JSON.stringify(historyLogs));
-        
-        // বর্তমান রেকর্ড ক্লিয়ার করা কিন্তু ইনপুট বক্সে লাস্ট পিস নম্বর ধরে রাখা
-        records = [];
-        alert('ট্রাক সংরক্ষিত হয়েছে। নতুন ট্রাকের জন্য মাপ শুরু করুন।');
+        records = []; // লিস্ট খালি করা
+        alert('ট্রাক সংরক্ষিত হয়েছে। গাছের নম্বর আগের সিরিয়ালেই থাকবে।');
         saveAndRender();
     }
 
@@ -215,10 +259,10 @@
         const list = document.getElementById('historyList');
         list.innerHTML = historyLogs.length === 0 ? "কোনো রেকর্ড নেই" : historyLogs.map((h, i) => `
             <div class="history-item">
-                <span><b>${h.truckNo}</b> - ${h.garden} (${h.date})</span>
+                <span><b>${toBn(h.truckNo)}</b> - ${h.garden} (${toBn(h.date)})</span>
                 <div>
-                    <button class="btn-edit" onclick="editHistory(${i})">Edit</button>
-                    <button class="btn-del-hist" onclick="deleteHistory(${i})">Delete</button>
+                    <button style="background:#ca8a04; color:white; padding:4px 8px; border-radius:4px;" onclick="editHistory(${i})">Edit</button>
+                    <button style="background:#ef4444; color:white; padding:4px 8px; border-radius:4px;" onclick="deleteHistory(${i})">Del</button>
                 </div>
             </div>
         `).join('');
@@ -226,29 +270,23 @@
 
     function editHistory(index) {
         const h = historyLogs[index];
-        if (confirm('আপনি কি এই ট্রাকটি এডিট করতে চান? বর্তমান কাজ আর্কাইভে থাকলে তা চেক করে নিন।')) {
+        if (confirm('এই ট্রাকটি এডিট করতে চান?')) {
             document.getElementById('truckInput').value = h.truckNo;
             document.getElementById('gardenInput').value = h.garden;
             document.getElementById('dateInput').value = h.date;
             records = h.data;
-            // এডিট করার সময় পিস নম্বর অটো লাস্ট পজিশনে সেট করা
-            if(records.length > 0) {
-                let lastP = records[records.length-1].pNo;
-                let parts = lastP.split('/');
-                document.getElementById('pieceNo').value = parts[0] + '/' + (parseInt(parts[1]) + 1);
-            }
             updateHeader();
             saveAndRender();
         }
     }
 
-    function deleteHistory(index) { if (confirm('স্থায়ীভাবে মুছবেন?')) { historyLogs.splice(index, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
+    function deleteHistory(index) { if (confirm('মুছে ফেলবেন?')) { historyLogs.splice(index, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
 
     // ১৫ সেকেন্ড পরপর অটো সেভ
     setInterval(() => {
         localStorage.setItem('bfidc_records', JSON.stringify(records));
         const s = document.getElementById('autoSaveStatus');
-        s.innerText = "অটো সেভ: " + new Date().toLocaleTimeString();
+        s.innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString());
     }, 15000);
 
     function saveDataFile() {
