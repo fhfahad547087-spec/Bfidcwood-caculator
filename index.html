@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - FIX COLUMN EDIT</title>
+    <title>BFIDC WOOD ERP - WORD EDITABLE</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
@@ -20,70 +20,47 @@
         .field input { padding: 12px; border: 1px solid #999; border-radius: 5px; font-size: 16px; outline: none; }
 
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-        button { cursor: pointer; padding: 12px 18px; font-weight: bold; border-radius: 5px; border: none; font-size: 15px; flex-grow: 1; }
-        .btn-add { background: #1b4332; color: white; min-width: 150px; }
+        button { cursor: pointer; padding: 10px 15px; font-weight: bold; border-radius: 5px; border: none; font-size: 14px; flex-grow: 1; }
+        .btn-add { background: #1b4332; color: white; }
         .btn-update { background: #ca8a04 !important; color: white; }
+        .btn-word { background: #2b5797; color: white; } /* Word blue */
         .btn-print { background: #333; color: white; }
 
-        /* Multi-page Watermark Setup */
-        .watermark {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140mm; 
-            opacity: 0.12; 
-            z-index: 0; 
-            pointer-events: none;
-            display: block;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
+        /* A4 Layout & Watermark */
         .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
-
-        /* A4 Page Layout */
         .wrapper { 
-            width: 210mm; 
-            min-height: 297mm; 
-            margin: 0 auto; 
-            background: #fff; 
-            padding: 15mm; 
-            border: 1px solid #ccc;
-            position: relative; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 15mm; 
+            border: 1px solid #ccc; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .watermark {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 140mm; opacity: 0.12; z-index: 0; pointer-events: none;
+            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
         }
 
         .header-section { text-align: center; margin-bottom: 10px; position: relative; z-index: 1; }
-        .header-section h2 { font-size: 22px; font-weight: bold; text-decoration: underline; }
+        .header-section h2 { font-size: 19px; font-weight: bold; text-decoration: underline; line-height: 1.4; }
         
-        .meta-info { display: flex; justify-content: space-between; margin-top: 15px; font-size: 18px; font-weight: bold; position: relative; z-index: 1; }
-        .meta-info div { flex: 1; }
-
-        /* Table Design */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; background: transparent; }
-        th, td { border: 1px solid #000; padding: 5px 2px; text-align: center; font-size: 15px; vertical-align: middle; }
+        .meta-info { display: flex; justify-content: space-between; margin-top: 15px; font-size: 17px; font-weight: bold; position: relative; z-index: 1; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; }
+        th, td { border: 1px solid #000; padding: 4px 2px; text-align: center; font-size: 15px; }
         th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
 
-        /* Action Buttons in Table */
         .action-btns { display: flex; justify-content: center; gap: 2px; border: none !important; }
-        .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 3px 6px; border-radius: 3px; border: none; cursor: pointer; }
-        .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 3px 6px; border-radius: 3px; border: none; cursor: pointer; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
+        .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
 
-        .totals-footer { margin-top: 25px; font-weight: bold; font-size: 19px; border-top: 2px solid #000; padding-top: 10px; position: relative; z-index: 1; }
+        .summary-container { margin-top: 10px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 5px; }
+        .totals-footer { font-weight: bold; font-size: 17px; }
+        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
             body { background: none; padding: 0; }
-            .preview-container { overflow: visible; }
-            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; box-shadow: none; }
+            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; }
             @page { size: A4; margin: 0; }
             .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
-        }
-
-        @media (max-width: 600px) {
-            .field { min-width: 100%; }
-            .meta-info { font-size: 14px; flex-direction: column; gap: 5px; }
-            .meta-info div { text-align: left !important; }
         }
     </style>
 </head>
@@ -103,19 +80,21 @@
     </div>
     <div class="btn-group">
         <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
+        <button class="btn-word" onclick="exportToWord()">📄 Word ফাইল সেভ</button>
         <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
-        <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 নতুন ট্রাক (Archive)</button>
-        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 ফাইল ব্যাকআপ</button>
+        <button class="btn-open" onclick="document.getElementById('fileOpener').click()">📂 ফাইল ওপেন (JSON)</button>
+        <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 আর্কাইভ</button>
         <button style="background:#d90429; color:white" onclick="clearCurrent()">মুছুন</button>
+        <input type="file" id="fileOpener" style="display:none" accept=".json" onchange="openDataFile(event)">
     </div>
     <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:10px; text-align:center;">অটো সেভ সচল...</div>
 </div>
 
 <div class="preview-container">
-    <div class="wrapper">
+    <div class="wrapper" id="printArea">
         <img src="logo.png" class="watermark" alt="Logo">
         <div class="header-section">
-            <h2>বিএফআইডিসি, <span id="gardenLabel">দাঁতমারা</span> রাবার বাগান  হতে বিএফআইডিসি, এলপিসি, কাপ্তাই প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট </h2>
+            <h2 id="mainTitle">বিএফআইডিসি, দাঁতমারা রাবার বাগান হতে বিএফআইডিসি, এলপিসি, কাপ্তাই প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট</h2>
         </div>
         <div class="meta-info">
             <div>সূত্র : <span id="sutraLabel">........</span></div>
@@ -125,21 +104,18 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 6%;">ক্রমিক</th>
-                    <th style="width: 12%;">গাছের নম্বর</th>
-                    <th style="width: 13%;">পরিমাপ</th>
-                    <th style="width: 9%;">ঘনফুট</th>
-                    <th style="width: 10%;" class="action-btns">E | X</th>
-                    <th style="width: 6%;">ক্রমিক</th>
-                    <th style="width: 12%;">গাছের নম্বর</th>
-                    <th style="width: 13%;">পরিমাপ</th>
-                    <th style="width: 9%;">ঘনফুট</th>
-                    <th style="width: 10%;" class="action-btns">E | X</th>
+                    <th style="width: 6%;">ক্রমিক</th><th style="width: 12%;">গাছের নম্বর</th><th style="width: 13%;">পরিমাপ</th><th style="width: 9%;">ঘনফুট</th>
+                    <th style="width: 10%;" class="action-btns">Edit</th>
+                    <th style="width: 6%;">ক্রমিক</th><th style="width: 12%;">গাছের নম্বর</th><th style="width: 13%;">পরিমাপ</th><th style="width: 9%;">ঘনফুট</th>
+                    <th style="width: 10%;" class="action-btns">Edit</th>
                 </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
         </table>
-        <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
+        <div class="summary-container">
+            <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
+            <div class="in-words" id="inWordsText">কথায়: শূন্য ঘনফুট মাত্র।</div>
+        </div>
     </div>
 </div>
 
@@ -163,7 +139,6 @@
     function handleEnterLength(e) { if (e.key === 'Enter') { e.preventDefault(); addNewSize(); } }
 
     function updateHeader() {
-        document.getElementById('gardenLabel').innerText = document.getElementById('gardenInput').value || '........';
         document.getElementById('sutraLabel').innerText = document.getElementById('sutraInput').value || '........';
         document.getElementById('dateLabel').innerText = document.getElementById('dateInput').value || '........';
         document.getElementById('truckLabel').innerText = document.getElementById('truckInput').value || '........';
@@ -173,89 +148,43 @@
         const pNoField = document.getElementById('pieceNo');
         const gVal = document.getElementById('girth').value;
         const lVal = document.getElementById('length').value;
-        const addBtn = document.getElementById('mainAddBtn');
-        
         if (!pNoField.value || !gVal || !lVal) return alert('সব ঘর পূরণ করুন');
-
         const g = parseFloat(gVal);
         const l = parseFloat(lVal);
         const cft = (Math.floor(((g * g * l) / 2304) * 100) / 100).toFixed(2);
         const entry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: cft };
-
-        if (editIndex !== null) {
-            records[editIndex] = entry;
-            editIndex = null;
-            addBtn.innerText = "+ লিস্টে যোগ করুন";
-            addBtn.style.background = "#1b4332";
-        } else {
-            records.push(entry);
-            let parts = pNoField.value.split('/');
-            if (parts.length === 2 && !isNaN(parts[1])) {
-                pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1);
-            }
-        }
-        document.getElementById('girth').value = '';
-        document.getElementById('length').value = '';
-        pNoField.focus();
-        saveAndRender();
+        if (editIndex !== null) { records[editIndex] = entry; editIndex = null; document.getElementById('mainAddBtn').innerText = "+ লিস্টে যোগ করুন"; }
+        else { records.push(entry); let parts = pNoField.value.split('/'); if (parts.length === 2 && !isNaN(parts[1])) { pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1); } }
+        document.getElementById('girth').value = ''; document.getElementById('length').value = ''; pNoField.focus(); saveAndRender();
     }
 
     function saveAndRender() {
         localStorage.setItem('bfidc_records', JSON.stringify(records));
-        const tbody = document.getElementById('dataTableBody');
-        tbody.innerHTML = '';
+        const tbody = document.getElementById('dataTableBody'); tbody.innerHTML = '';
         let totalCft = 0; let treeSet = new Set();
-        
-        // এখানে কলাম ঠিক করার লজিক (৪০ সারি পর পর ভাগ হবে)
-        const rowLimit = 40; 
-        const displayRows = Math.max(Math.ceil(records.length / 2), rowLimit);
-        
-        // বর্তমান রেকর্ডের ভিত্তিতে লুপ
-        const totalItems = records.length;
-
+        const displayRows = Math.max(Math.ceil(records.length / 2), 40);
         for (let i = 0; i < displayRows; i++) {
-            const leftIdx = i;
-            const rightIdx = i + displayRows;
-
-            const left = records[leftIdx] || null;
-            const right = records[rightIdx] || null;
-
-            if (!left && !right && i >= totalItems) break;
-
+            const leftIdx = i; const rightIdx = i + displayRows;
+            const left = records[leftIdx] || null; const right = records[rightIdx] || null;
+            if (!left && !right && i >= records.length) break;
             tbody.innerHTML += `<tr>
-                <td>${left ? toBn(leftIdx + 1) : ''}</td>
-                <td>${left ? toBn(left.pNo) : ''}</td>
-                <td>${left ? toBn(left.size) : ''}</td>
-                <td>${left ? toBn(left.cft) : ''}</td>
-                <td class="action-btns">
-                    ${left ? `<button class="edit-btn" onclick="editRow(${leftIdx})">E</button><button class="del-btn" onclick="removeRow(${leftIdx})">X</button>` : ''}
-                </td>
-                <td>${right ? toBn(rightIdx + 1) : ''}</td>
-                <td>${right ? toBn(right.pNo) : ''}</td>
-                <td>${right ? toBn(right.size) : ''}</td>
-                <td>${right ? toBn(right.cft) : ''}</td>
-                <td class="action-btns">
-                    ${right ? `<button class="edit-btn" onclick="editRow(${rightIdx})">E</button><button class="del-btn" onclick="removeRow(${rightIdx})">X</button>` : ''}
-                </td>
+                <td>${left ? toBn(leftIdx + 1) : ''}</td><td>${left ? toBn(left.pNo) : ''}</td><td>${left ? toBn(left.size) : ''}</td><td>${left ? toBn(left.cft) : ''}</td>
+                <td class="action-btns">${left ? `<button class="edit-btn" onclick="editRow(${leftIdx})">E</button><button class="del-btn" onclick="removeRow(${leftIdx})">X</button>` : ''}</td>
+                <td>${right ? toBn(rightIdx + 1) : ''}</td><td>${right ? toBn(right.pNo) : ''}</td><td>${right ? toBn(right.size) : ''}</td><td>${right ? toBn(right.cft) : ''}</td>
+                <td class="action-btns">${right ? `<button class="edit-btn" onclick="editRow(${rightIdx})">E</button><button class="del-btn" onclick="removeRow(${rightIdx})">X</button>` : ''}</td>
             </tr>`;
         }
-
         records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
-        document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalCft.toFixed(2))}`;
+        const totalStr = totalCft.toFixed(2);
+        document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalStr)}`;
+        document.getElementById('inWordsText').innerText = "কথায়: " + toBn(totalStr.split('.')[0]) + " দশমিক " + toBn(totalStr.split('.')[1]) + " ঘনফুট মাত্র।";
         renderHistory();
     }
 
     function editRow(idx) {
-        const item = records[idx];
-        const addBtn = document.getElementById('mainAddBtn');
-        editIndex = idx;
-        document.getElementById('pieceNo').value = item.pNo;
-        document.getElementById('girth').value = item.gVal;
-        document.getElementById('length').value = item.lVal;
-        addBtn.innerText = "সংশোধন (Update)";
-        addBtn.style.background = "#ca8a04";
-        document.getElementById('girth').focus();
-        window.scrollTo(0, 0); 
+        const item = records[idx]; editIndex = idx;
+        document.getElementById('pieceNo').value = item.pNo; document.getElementById('girth').value = item.gVal; document.getElementById('length').value = item.lVal;
+        document.getElementById('mainAddBtn').innerText = "সংশোধন (Update)"; window.scrollTo(0, 0); 
     }
 
     function removeRow(idx) { if(confirm('ডিলিট করবেন?')) { records.splice(idx, 1); saveAndRender(); } }
@@ -264,48 +193,94 @@
     function archiveTruck() {
         if (records.length === 0) return alert('ডাটা নেই!');
         historyLogs.push({ truckNo: document.getElementById('truckInput').value, garden: document.getElementById('gardenInput').value, date: document.getElementById('dateInput').value, data: [...records] });
-        localStorage.setItem('bfidc_history', JSON.stringify(historyLogs));
-        records = [];
-        saveAndRender();
-        alert('আর্কাইভ সম্পন্ন!');
+        localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); records = []; saveAndRender();
     }
 
     function renderHistory() {
         const hList = document.getElementById('historyList');
-        hList.innerHTML = historyLogs.length === 0 ? "কোনো সংরক্ষিত ট্রাক নেই" : historyLogs.map((h, i) => `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
-                <span><b>${toBn(h.truckNo)}</b> - ${h.garden}</span>
-                <div>
-                    <button style="padding:5px 10px; background:#ca8a04; color:white; border:none; border-radius:4px;" onclick="editHistory(${i})">Edit</button>
-                    <button style="padding:5px 10px; background:#ef4444; color:white; border:none; border-radius:4px; margin-left:5px;" onclick="deleteHistory(${i})">X</button>
-                </div>
-            </div>
-        `).join('');
+        hList.innerHTML = historyLogs.map((h, i) => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+            <span><b>${toBn(h.truckNo)}</b> - ${h.garden}</span>
+            <div><button onclick="editHistory(${i})">Edit</button> <button onclick="deleteHistory(${i})">X</button></div></div>`).join('');
     }
 
     function editHistory(idx) {
-        const h = historyLogs[idx];
-        document.getElementById('truckInput').value = h.truckNo;
-        document.getElementById('gardenInput').value = h.garden;
-        document.getElementById('dateInput').value = h.date;
-        records = h.data;
-        updateHeader();
-        saveAndRender();
-        window.scrollTo(0, 0);
+        const h = historyLogs[idx]; document.getElementById('truckInput').value = h.truckNo; document.getElementById('gardenInput').value = h.garden; document.getElementById('dateInput').value = h.date;
+        records = h.data; updateHeader(); saveAndRender();
     }
 
-    function deleteHistory(idx) { if(confirm('হিস্ট্রি থেকে ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
+    function deleteHistory(idx) { if(confirm('ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
 
-    setInterval(() => {
-        localStorage.setItem('bfidc_records', JSON.stringify(records));
-        document.getElementById('autoSaveStatus').innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString());
-    }, 15000);
+    // Export to Editable Microsoft Word
+    function exportToWord() {
+        const header = document.getElementById('mainTitle').innerText;
+        const sutra = document.getElementById('sutraLabel').innerText;
+        const date = document.getElementById('dateLabel').innerText;
+        const truck = document.getElementById('truckLabel').innerText;
+        const summary = document.getElementById('summaryText').innerText;
+        const words = document.getElementById('inWordsText').innerText;
 
+        let tableContent = "";
+        const displayRows = Math.max(Math.ceil(records.length / 2), 40);
+        for (let i = 0; i < displayRows; i++) {
+            const left = records[i] || null;
+            const right = records[i + displayRows] || null;
+            tableContent += `<tr>
+                <td style="border:1px solid black; text-align:center;">${left ? toBn(i + 1) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${left ? toBn(left.pNo) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${left ? toBn(left.size) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${left ? toBn(left.cft) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${right ? toBn(i + displayRows + 1) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${right ? toBn(right.pNo) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${right ? toBn(right.size) : ''}</td>
+                <td style="border:1px solid black; text-align:center;">${right ? toBn(right.cft) : ''}</td>
+            </tr>`;
+        }
+
+        const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'>
+        <style>
+            body { font-family: 'Nikosh', 'Arial Unicode MS', sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid black; padding: 5px; font-size: 12pt; }
+        </style>
+        </head>
+        <body>
+            <div style="text-align:center;"><h3><u>${header}</u></h3></div>
+            <table style="border:none; width:100%;">
+                <tr><td style="border:none;">সূত্র: ${sutra}</td><td style="border:none; text-align:center;">তারিখ: ${date}</td><td style="border:none; text-align:right;">ট্রাক নং: ${truck}</td></tr>
+            </table>
+            <br>
+            <table>
+                <thead><tr style="background-color:#eee;"><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th></tr></thead>
+                <tbody>${tableContent}</tbody>
+            </table>
+            <div style="margin-top:10px;"><strong>${summary}</strong><br><strong>${words}</strong></div>
+        </body></html>`;
+
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `BFIDC_${truck || 'List'}.doc`;
+        link.click();
+    }
+
+    // JSON Open/Save
     function saveDataFile() {
-        const blob = new Blob([JSON.stringify({ records, history: historyLogs })], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "BFIDC_Data_Backup.json"; a.click();
+        const data = { garden: document.getElementById('gardenInput').value, sutra: document.getElementById('sutraInput').value, date: document.getElementById('dateInput').value, truck: document.getElementById('truckInput').value, records: records };
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `BFIDC_Backup.json`; a.click();
     }
 
+    function openDataFile(e) {
+        const reader = new FileReader(); reader.onload = function(ev) {
+            const data = JSON.parse(ev.target.result);
+            document.getElementById('sutraInput').value = data.sutra || ''; document.getElementById('dateInput').value = data.date || ''; document.getElementById('truckInput').value = data.truck || '';
+            records = data.records || []; updateHeader(); saveAndRender();
+        }; reader.readAsText(e.target.files[0]);
+    }
+
+    setInterval(() => { localStorage.setItem('bfidc_records', JSON.stringify(records)); document.getElementById('autoSaveStatus').innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString()); }, 15000);
     window.onload = () => { updateHeader(); saveAndRender(); };
 </script>
 
