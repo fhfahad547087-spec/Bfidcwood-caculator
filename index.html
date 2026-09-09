@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - FINAL VERSION</title>
+    <title>BFIDC WOOD ERP - FINAL FIX</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
@@ -26,7 +26,7 @@
         .btn-word { background: #2b5797; color: white; }
         .btn-print { background: #333; color: white; }
 
-        /* A4 Layout & Multi-page Watermark */
+        /* A4 Layout & Watermark */
         .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
         .wrapper { 
             width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 15mm; 
@@ -51,36 +51,42 @@
         .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
         .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
 
-        .summary-container { margin-top: 10px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 5px; }
+        /* Footer Summary */
+        .summary-container { 
+            margin-top: 10px; 
+            position: relative; 
+            z-index: 1; 
+            border-top: 1px solid #000; 
+            padding-top: 5px;
+            page-break-inside: avoid; /* প্রিন্টে যেন না ভাঙে */
+        }
         .totals-footer { font-weight: bold; font-size: 17px; }
-        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; color: #1b4332; }
+        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; color: #000; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
             body { background: none; padding: 0; }
-            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; }
+            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; min-height: auto; }
             @page { size: A4; margin: 0; }
             .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
+            .summary-container { page-break-after: auto; }
         }
     </style>
 </head>
 <body>
 
 <div class="input-panel">
-    <!-- Header Inputs -->
     <div class="input-row">
         <div class="field"><label>বাগানের নাম:</label><input type="text" id="gardenInput" value="দাঁতমারা" oninput="updateHeader()"></div>
         <div class="field"><label>সূত্র:</label><input type="text" id="sutraInput" oninput="updateHeader()"></div>
         <div class="field"><label>তারিখ:</label><input type="text" id="dateInput" oninput="updateHeader()"></div>
         <div class="field"><label>ট্রাক নং:</label><input type="text" id="truckInput" oninput="updateHeader()"></div>
     </div>
-    <!-- Data Inputs -->
     <div class="input-row">
         <div class="field"><label>গাছের নম্বর/পিস:</label><input type="text" id="pieceNo" value="1/1" onkeydown="handleEnter(event, 'girth')"></div>
         <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="বেড়" onkeydown="handleEnter(event, 'length')"></div>
         <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="লম্বা" onkeydown="handleEnterLength(event)"></div>
     </div>
-    <!-- Buttons -->
     <div class="btn-group">
         <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
         <button class="btn-word" onclick="exportToWord()">📄 Word ফাইল সেভ</button>
@@ -96,9 +102,7 @@
 
 <div class="preview-container">
     <div class="wrapper" id="printArea">
-        <!-- Logo Watermark from GitHub -->
         <img src="logo.png" class="watermark" alt="Logo">
-        
         <div class="header-section">
             <h2 id="mainTitle">বিএফআইডিসি, দাঁতমারা রাবার বাগান হতে বিএফআইডিসি, এলপিসি, কাপ্তাই প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট</h2>
         </div>
@@ -126,7 +130,7 @@
 </div>
 
 <div class="history-section" style="max-width: 950px; margin: 10px auto; padding:15px; background:#fff; border-radius:10px; border:1px solid #94a3b8;">
-    <h3 style="margin-bottom:10px; font-size:16px;">📜 সংরক্ষিত ট্রাক (History)</h3>
+    <h3 style="margin-bottom:10px; font-size:16px;">📜 History (সংরক্ষিত ট্রাক)</h3>
     <div id="historyList"></div>
 </div>
 
@@ -135,50 +139,42 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
-    // Number to Bengali digits
+    const bnDigitWords = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
+
     function toBn(n) {
         if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
         return n.toString().split('').map(char => bn[char] || char).join('');
     }
 
-    // Number to Bengali Words
-    function toBnWord(n) {
-        const words = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়", "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ", "বিশ", "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আটাশ", "ঊনত্রিশ", "ত্রিশ", "একত্রিশ", "বত্রিশ", "তেত্রিশ", "চৌত্রিশ", "পঁয়ত্রিশ", "ছত্রিশ", "সাঁইত্রিশ", "আটত্রিশ", "ঊনচল্লিশ", "চল্লিশ", "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চুয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আটচল্লিশ", "ঊনপঞ্চাশ", "পঞ্চাশ"];
-        
-        let num = parseInt(n);
-        if (num <= 50) return words[num];
-        
-        // Simple fallback for higher numbers
-        return toBn(num);
-    }
-
-    // Full In Words logic
-    function convertToFullWords(trees, pieces, cft) {
-        let treeWords = treeSetToWords(trees);
-        let pieceWords = treeSetToWords(pieces);
-        let cftParts = cft.toString().split('.');
-        let cftInt = treeSetToWords(cftParts[0]);
-        let cftDec = treeSetToWords(cftParts[1] || "00");
-
-        return `কথায়: ${treeWords} টি গাছে ${pieceWords} টি টুকরা সমান ${cftInt} দশমিক ${cftDec} ঘনফুট।`;
-    }
-
-    // Basic Bengali word converter for numbers up to 999
+    // পূর্ণ সংখ্যার জন্য বাংলা কথা
     function treeSetToWords(n) {
         const unit = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
         const teen = ["দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ"];
         const tens = ["", "", "বিশ", "ত্রিশ", "চল্লিশ", "পঞ্চাশ", "ষাট", "সত্তুর", "আশি", "নব্বই"];
-        
         let num = parseInt(n);
         if (num === 0) return "শূণ্য";
         let str = "";
-        
         if (num >= 100) { str += unit[Math.floor(num/100)] + " শত "; num %= 100; }
         if (num >= 20) { str += tens[Math.floor(num/10)] + " "; num %= 10; str += unit[num]; }
         else if (num >= 10) { str += teen[num-10]; }
         else { str += unit[num]; }
         return str.trim();
+    }
+
+    // দশমিকের পরের অংশ ডিজিট অনুযায়ী উচ্চারণের জন্য
+    function decimalToWords(n) {
+        return n.toString().split('').map(digit => bnDigitWords[parseInt(digit)] || "").join(' ');
+    }
+
+    function convertToFullWords(trees, pieces, cft) {
+        let treeWords = treeSetToWords(trees);
+        let pieceWords = treeSetToWords(pieces);
+        let cftParts = cft.toString().split('.');
+        let cftIntWords = treeSetToWords(cftParts[0]);
+        let cftDecWords = decimalToWords(cftParts[1] || "00");
+
+        return `কথায়: ${treeWords} টি গাছে ${pieceWords} টি টুকরা সমান ${cftIntWords} দশমিক ${cftDecWords} ঘনফুট।`;
     }
 
     function handleEnter(e, nextId) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById(nextId).focus(); } }
@@ -223,8 +219,6 @@
         records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
         const totalStr = totalCft.toFixed(2);
         document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalStr)}`;
-        
-        // Update In Words Text
         document.getElementById('inWordsText').innerText = convertToFullWords(treeSet.size, records.length, totalStr);
         renderHistory();
     }
@@ -265,12 +259,10 @@
         const truck = document.getElementById('truckLabel').innerText;
         const summary = document.getElementById('summaryText').innerText;
         const words = document.getElementById('inWordsText').innerText;
-
         let tableContent = "";
         const displayRows = Math.max(Math.ceil(records.length / 2), 40);
         for (let i = 0; i < displayRows; i++) {
-            const left = records[i] || null;
-            const right = records[i + displayRows] || null;
+            const left = records[i] || null; const right = records[i + displayRows] || null;
             tableContent += `<tr>
                 <td style="border:1px solid black; text-align:center;">${left ? toBn(i + 1) : ''}</td>
                 <td style="border:1px solid black; text-align:center;">${left ? toBn(left.pNo) : ''}</td>
@@ -282,34 +274,9 @@
                 <td style="border:1px solid black; text-align:center;">${right ? toBn(right.cft) : ''}</td>
             </tr>`;
         }
-
-        const html = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'>
-        <style>
-            body { font-family: 'Nikosh', 'Arial Unicode MS', sans-serif; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid black; padding: 5px; font-size: 12pt; }
-        </style>
-        </head>
-        <body>
-            <div style="text-align:center;"><h3><u>${header}</u></h3></div>
-            <table style="border:none; width:100%;">
-                <tr><td style="border:none;">সূত্র: ${sutra}</td><td style="border:none; text-align:center;">তারিখ: ${date}</td><td style="border:none; text-align:right;">ট্রাক নং: ${truck}</td></tr>
-            </table>
-            <br>
-            <table>
-                <thead><tr style="background-color:#eee;"><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th></tr></thead>
-                <tbody>${tableContent}</tbody>
-            </table>
-            <div style="margin-top:10px;"><strong>${summary}</strong><br><strong>${words}</strong></div>
-        </body></html>`;
-
+        const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:'Nikosh',serif;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid black;padding:5px;font-size:12pt;}</style></head><body><div style="text-align:center;"><h3><u>${header}</u></h3></div><table style="border:none;width:100%;"><tr><td style="border:none;">সূত্র: ${sutra}</td><td style="border:none;text-align:center;">তারিখ: ${date}</td><td style="border:none;text-align:right;">ট্রাক নং: ${truck}</td></tr></table><br><table><thead><tr style="background-color:#eee;"><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th></tr></thead><tbody>${tableContent}</tbody></table><div style="margin-top:10px;"><strong>${summary}</strong><br><strong>${words}</strong></div></body></html>`;
         const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `BFIDC_${truck || 'List'}.doc`;
-        link.click();
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `BFIDC_${truck || 'List'}.doc`; link.click();
     }
 
     function saveDataFile() {
