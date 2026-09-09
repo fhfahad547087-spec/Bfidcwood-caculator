@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>গোল কাঠ সিএফটি ক্যালকুলেটর (Wood CFT Calculator)</title>
+    <title>BFIDC FINAL ERP - কাঠের সাইজ লিস্ট</title>
+    <!-- Nikosh ফন্ট সিডিএন -->
+    <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         :root {
             --primary: #1b4332;
             --primary-light: #2d6a4f;
             --primary-hover: #081c15;
-            --accent: #d97706;
-            --bg: #f4f6f8;
+            --accent: #b45309;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #4b5563;
-            --border: #e5e7eb;
-            --danger: #ef4444;
+            --border: #cbd5e1;
+            --danger: #dc2626;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            font-family: 'Nikosh', 'Segoe UI', Tahoma, sans-serif;
         }
 
         body {
@@ -30,65 +32,72 @@
             color: var(--text-main);
             padding: 20px 15px;
             line-height: 1.5;
+            font-size: 1.05rem;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
+        /* PDF এর হুবহু হেডার ডিজাইন */
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            padding: 24px 20px;
-            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
 
-        header h1 {
-            font-size: 1.8rem;
+        header .erp-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #111827;
             margin-bottom: 6px;
-            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        header p {
-            font-size: 0.95rem;
-            opacity: 0.9;
+        header .sub-title {
+            font-size: 1.15rem;
+            color: #374151;
+            line-height: 1.6;
         }
 
         .formula-badge {
             display: inline-block;
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            padding: 4px 14px;
+            background: #f1f5f9;
+            border: 1px dashed #94a3b8;
+            border-radius: 6px;
+            padding: 4px 12px;
             margin-top: 10px;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
+            color: #0f172a;
         }
 
+        /* কার্ড এবং ইনপুট ফর্ম */
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 22px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            margin-bottom: 22px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
             border: 1px solid var(--border);
         }
 
         .card-title {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 16px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 14px;
             color: var(--primary);
         }
 
         .input-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 15px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .form-group {
@@ -97,17 +106,17 @@
         }
 
         .form-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: bold;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .form-group input {
-            padding: 10px 12px;
+            padding: 9px 12px;
             border: 1.5px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 6px;
+            font-size: 1.05rem;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -125,10 +134,10 @@
         button {
             cursor: pointer;
             border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: bold;
             transition: all 0.2s;
         }
 
@@ -142,13 +151,13 @@
         }
 
         .btn-secondary {
-            background-color: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
         }
 
         .btn-secondary:hover {
-            background-color: #e5e7eb;
+            background-color: #e2e8f0;
         }
 
         .btn-danger {
@@ -160,20 +169,20 @@
             background-color: #fecaca;
         }
 
+        /* পরিসংখ্যান */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: var(--card-bg);
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: 8px;
+            padding: 14px;
             border: 1px solid var(--border);
             text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
             border-top: 4px solid var(--primary);
         }
 
@@ -182,15 +191,15 @@
         }
 
         .stat-title {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
+            font-weight: bold;
             color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .stat-value {
-            font-size: 1.7rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: bold;
             color: var(--primary-hover);
         }
 
@@ -198,44 +207,39 @@
             color: var(--accent);
         }
 
+        /* টেবিল */
         .table-container {
             overflow-x: auto;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid var(--border);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.95rem;
-            text-align: left;
+            font-size: 1.05rem;
+            text-align: center;
             background: white;
         }
 
         thead tr {
-            background-color: #f8fafc;
-            color: var(--text-muted);
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
             border-bottom: 2px solid var(--border);
         }
 
         th, td {
-            padding: 12px 16px;
-        }
-
-        tbody tr {
+            padding: 10px 14px;
             border-bottom: 1px solid var(--border);
         }
 
         tbody tr:nth-child(even) {
-            background-color: #fafbfc;
-        }
-
-        tbody tr:hover {
-            background-color: #f0fdf4;
+            background-color: #f8fafc;
         }
 
         .cft-cell {
-            font-weight: 700;
+            font-weight: bold;
             color: var(--primary);
         }
 
@@ -244,57 +248,60 @@
             border: none;
             color: var(--danger);
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            padding: 2px 6px;
+            font-size: 1rem;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px;
             color: var(--text-muted);
         }
 
         @media print {
             body { background: white; padding: 0; }
-            .card, header { box-shadow: none; border: none; }
-            .form-section, .btn-group, .action-btn, th:last-child, td:last-child { display: none !important; }
-            table { border: 1px solid #000; }
-            th, td { border: 1px solid #ccc; }
+            .card, header { box-shadow: none; border: 1px solid #000; }
+            .form-section, .btn-group, .action-bar, .action-btn, th:last-child, td:last-child { display: none !important; }
+            table { border: 1px solid #000; width: 100%; }
+            th, td { border: 1px solid #000; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- PDF এর হুবহু হেডার -->
     <header>
-        <h1>গোল কাঠ ও লগ সিএফটি ক্যালকুলেটর</h1>
-        <p>BFIDC ও স্ট্যান্ডার্ড কোয়ার্টার গার্থ সূত্র (Quarter Girth Formula)</p>
+        <div class="erp-title">BFIDC FINAL ERP</div>
+        <div class="sub-title">
+            বাংলাদেশ বন শিল্প উন্নয়ন কর্পোরেশন, রাউজান রাবার বাগান হতে বিএফআইডিসি, এলপিসি<br>
+            প্রেরণের জন্য কর্তনকৃত জীবনচক্র হারানো রাবার কাঠের সাইজ লিস্ট।
+        </div>
         <div class="formula-badge">
-            CFT = (বেড়" × বেড়" × লম্বা') ÷ ২৩MD
+            সূত্র: (বেড়" × বেড়" × লম্বা') ÷ ২৩MD = CFT (দশমিকের পর ২ ঘর)
         </div>
     </header>
 
-    <!-- Entry Form -->
+    <!-- ইনপুট ফর্ম -->
     <div class="card form-section">
-        <div class="card-title">নতুন সাইজ যুক্ত করুন</div>
+        <div class="card-title">নতুন কাঠের সাইজ যোগ করুন</div>
         <form id="woodForm" onsubmit="addRow(event)">
             <div class="input-grid">
                 <div class="form-group">
-                    <label for="treeNo">গাছ/পিস নং (উদা: 310/1)</label>
-                    <input type="text" id="treeNo" placeholder="310/1" required autocomplete="off">
+                    <label for="treeNo">গাছ/পিস</label>
+                    <input type="text" id="treeNo" placeholder="যেমন: 310/1" required autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label for="girth">বেড় বা ঘের (ইঞ্চি)</label>
-                    <input type="number" id="girth" step="any" placeholder="30" required>
+                    <label for="girth">বেড় (ইঞ্চি - ")</label>
+                    <input type="number" id="girth" step="any" placeholder="যেমন: 30" required>
                 </div>
                 <div class="form-group">
-                    <label for="length">দৈর্ঘ্য বা লম্বা (ফুট)</label>
-                    <input type="number" id="length" step="any" placeholder="5" required>
+                    <label for="length">লম্বা (ফুট - ')</label>
+                    <input type="number" id="length" step="any" placeholder="যেমন: 5" required>
                 </div>
                 <div class="form-group">
-                    <label for="cftPreview">সিএফটি (CFT Preview)</label>
-                    <input type="text" id="cftPreview" placeholder="0.00" readonly style="background-color: #f8fafc; font-weight: bold; color: var(--primary);">
+                    <label for="cftPreview">সিএফটি (CFT)</label>
+                    <input type="text" id="cftPreview" placeholder="0.00" readonly style="background-color: #f1f5f9; font-weight: bold; color: var(--primary);">
                 </div>
             </div>
             <div class="btn-group">
@@ -304,29 +311,29 @@
         </form>
     </div>
 
-    <!-- Summary Statistics -->
+    <!-- মোট হিসাব -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-title">মোট গাছ</div>
-            <div class="stat-value" id="totalTrees">0</div>
+            <div class="stat-value" id="totalTrees">0 টি</div>
         </div>
         <div class="stat-card">
             <div class="stat-title">মোট পিস</div>
-            <div class="stat-value" id="totalPieces">0</div>
+            <div class="stat-value" id="totalPieces">0 টি</div>
         </div>
         <div class="stat-card accent">
-            <div class="stat-title">মোট সিএফটি (CFT)</div>
+            <div class="stat-title">মোট সিএফটি</div>
             <div class="stat-value" id="totalCFT">0.00</div>
         </div>
     </div>
 
-    <!-- Results Table -->
+    <!-- টেবিল তালিকা -->
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div class="card-title" style="margin-bottom: 0;">সাইজ ও পরিমাপের তালিকা</div>
-            <div>
-                <button type="button" class="btn-secondary" onclick="window.print()" style="padding: 6px 14px; font-size: 0.85rem;">🖨️ প্রিন্ট / PDF</button>
-                <button type="button" class="btn-danger" onclick="clearAllData()" style="padding: 6px 14px; font-size: 0.85rem;">🗑️ সব মুছুন</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="card-title" style="margin-bottom: 0;">সাইজ তালিকা</div>
+            <div class="action-bar">
+                <button type="button" class="btn-secondary" onclick="window.print()" style="font-size: 0.9rem;">🖨️ প্রিন্ট / PDF</button>
+                <button type="button" class="btn-danger" onclick="clearAllData()" style="font-size: 0.9rem;">🗑️ সব মুছুন</button>
             </div>
         </div>
 
@@ -335,22 +342,22 @@
                 <thead>
                     <tr>
                         <th style="width: 70px;">ক্রমিক</th>
-                        <th>গাছ/পিস নং</th>
-                        <th>সাইজ (বেড়" × লম্বা')</th>
-                        <th>সিএফটি (CFT)</th>
-                        <th style="width: 80px; text-align: center;">অ্যাকশন</th>
+                        <th>গাছ/পিস</th>
+                        <th>সাইজ</th>
+                        <th>সিএফটি</th>
+                        <th style="width: 70px;">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody id="logTableBody"></tbody>
             </table>
-            <div id="emptyState" class="empty-state">কোনো ডেটা এন্ট্রি করা হয়নি। মাপ দিয়ে যোগ করুন।</div>
+            <div id="emptyState" class="empty-state">এখনও কোনো মাপ যোগ করা হয়নি।</div>
         </div>
     </div>
 </div>
 
 <script>
-    const FORMULA_DIVISOR = 2304; // Standard Quarter Girth: (G/4)^2 * L / 144 = G^2 * L / 2304
-    let logList = JSON.parse(localStorage.getItem('wood_cft_records')) || [];
+    const FORMULA_DIVISOR = 2304;
+    let logList = JSON.parse(localStorage.getItem('bfidc_wood_data')) || [];
 
     const girthInput = document.getElementById('girth');
     const lengthInput = document.getElementById('length');
@@ -389,13 +396,12 @@
         logList.push({
             id: Date.now(),
             treeNo: treeNo,
-            sizeText: `${girth}" × ${length}'`,
+            sizeText: `${girth}"×${length}'`,
             cft: cft.toFixed(2)
         });
 
         saveAndRender();
 
-        // Auto increment tree number (e.g. 310/1 -> 310/2)
         const parts = treeNo.split('/');
         if (parts.length === 2 && !isNaN(parts[1])) {
             treeNoInput.value = `${parts[0]}/${parseInt(parts[1]) + 1}`;
@@ -428,7 +434,7 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('wood_cft_records', JSON.stringify(logList));
+        localStorage.setItem('bfidc_wood_data', JSON.stringify(logList));
         renderTable();
         updateSummary();
     }
@@ -451,7 +457,7 @@
                 <td><strong>${item.treeNo}</strong></td>
                 <td>${item.sizeText}</td>
                 <td class="cft-cell">${item.cft}</td>
-                <td style="text-align: center;">
+                <td>
                     <button class="action-btn" title="মুছুন" onclick="deleteRow(${item.id})">✕</button>
                 </td>
             `;
@@ -468,8 +474,8 @@
             totalCFT += parseFloat(item.cft) || 0;
         });
 
-        document.getElementById('totalTrees').textContent = treeSet.size ? `${treeSet.size} টি` : '0';
-        document.getElementById('totalPieces').textContent = logList.length ? `${logList.length} টি` : '0';
+        document.getElementById('totalTrees').textContent = `${treeSet.size} টি`[span_1](start_span)[span_1](end_span);
+        document.getElementById('totalPieces').textContent = `${logList.length} টি`[span_2](start_span)[span_2](end_span);
         document.getElementById('totalCFT').textContent = totalCFT.toFixed(2);
     }
 
