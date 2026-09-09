@@ -3,13 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - PRINT READY</title>
+    <title>BFIDC WOOD ERP - MULTI-PAGE WATERMARK</title>
     <link href="https://fonts.maateen.me/nikosh/font.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nikosh', sans-serif; }
         body { background: #f0f2f5; padding: 10px; color: #000; }
 
-        /* A4 Wrapper Setup */
+        /* ইনপুট প্যানেল ডিজাইন */
+        .input-panel { 
+            max-width: 950px; margin: 0 auto 20px auto; background: #fff; padding: 15px; 
+            border-radius: 10px; border: 2px solid #1b4332; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        .input-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .field { flex: 1; min-width: 45%; display: flex; flex-direction: column; }
+        .field label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #1b4332; }
+        .field input { padding: 12px; border: 1px solid #999; border-radius: 5px; font-size: 16px; outline: none; }
+
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        button { cursor: pointer; padding: 12px 18px; font-weight: bold; border-radius: 5px; border: none; font-size: 15px; flex-grow: 1; }
+        .btn-add { background: #1b4332; color: white; min-width: 150px; }
+        .btn-update { background: #ca8a04 !important; color: white; }
+        .btn-print { background: #333; color: white; }
+
+        /* প্রিভিউ কন্টেইনার (মোবাইলে স্ক্রল করার জন্য) */
+        .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
+
+        /* A4 পেজ ডিজাইন */
         .wrapper { 
             width: 210mm; 
             min-height: 297mm; 
@@ -17,22 +36,23 @@
             background: #fff; 
             padding: 15mm; 
             border: 1px solid #ccc;
-            position: relative; /* লোগোকে মাঝখানে রাখার জন্য */
-            overflow: hidden;
-            display: block;
+            position: relative; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
 
-        /* Watermark Logo - মাঝখানে সেট করার জন্য */
+        /* লোগো ওয়াটারমার্ক - প্রতিটি পেজের জন্য */
         .watermark {
-            position: absolute;
-            top: 50%; 
-            left: 50%;
-            transform: translate(-50%, -50%); /* একদম সেন্টার পয়েন্ট */
-            width: 140mm; /* এ৪ পেপারের জন্য আদর্শ সাইজ */
-            opacity: 0.12; /* আবছা ভাব (১০-১৫% এর মধ্যে রাখা ভালো) */
-            z-index: 0; /* লেখার নিচে থাকবে */
+            position: fixed; /* এটি প্রতিটি পেজে লোগোটি রিপিট করবে */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140mm; 
+            opacity: 0.12; 
+            z-index: 0; 
             pointer-events: none;
-            -webkit-print-color-adjust: exact; /* প্রিন্টে যেন কালার ঠিক থাকে */
+            display: block;
+            /* গ্রাফিক্স অটোমেটিক চালু করার জন্য */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .header-section { text-align: center; margin-bottom: 10px; position: relative; z-index: 1; }
@@ -43,42 +63,42 @@
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; background: transparent; }
         th, td { border: 1px solid #000; padding: 5px 2px; text-align: center; font-size: 16px; }
-        th { background: #e8e8e8 !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+        th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
 
-        /* Input Panel (প্রিন্টে লুকানো থাকবে) */
-        .input-panel { 
-            max-width: 950px; margin: 10px auto 20px auto; background: #fff; padding: 20px; 
-            border-radius: 8px; border: 2px solid #1b4332; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        }
-        .input-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-        .field { flex: 1; min-width: 120px; display: flex; flex-direction: column; }
-        .field label { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-        .field input { padding: 8px; border: 1px solid #999; border-radius: 4px; font-size: 16px; outline: none; }
-
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        button { cursor: pointer; padding: 10px 15px; font-weight: bold; border-radius: 4px; border: none; font-size: 14px; }
-        .btn-add { background: #1b4332; color: white; }
-        .btn-update { background: #ca8a04 !important; color: white; }
-        .btn-print { background: #333; color: white; }
-        
-        .action-btns { display: flex; justify-content: center; gap: 3px; }
-        .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 2px 6px; border-radius: 3px; border: none; }
-        .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 2px 6px; border-radius: 3px; border: none; }
+        .action-btns { display: flex; justify-content: center; gap: 4px; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: none; }
+        .del-btn { background: #ef4444; color: white; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: none; }
 
         .totals-footer { margin-top: 25px; font-weight: bold; font-size: 19px; border-top: 2px solid #000; padding-top: 10px; position: relative; z-index: 1; }
 
         @media print {
-            body { background: none; padding: 0; }
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
-            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; }
+            body { background: none; padding: 0; }
+            .preview-container { overflow: visible; }
+            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; box-shadow: none; }
             @page { size: A4; margin: 0; }
-            .watermark { opacity: 0.15 !important; display: block !important; } /* প্রিন্টে লোগো নিশ্চিত করা */
+            .watermark { 
+                position: fixed !important; /* প্রিন্ট করার সময় প্রতিটি পেজে ফিক্সড থাকবে */
+                opacity: 0.15 !important; 
+                visibility: visible !important;
+                display: block !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .field { min-width: 100%; }
+            .header-section h2 { font-size: 18px; }
+            .meta-info { font-size: 14px; flex-direction: column; gap: 5px; }
+            .meta-info div { text-align: left !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="input-panel">
+    <!-- ইনপুট ফিল্ড সমূহ -->
     <div class="input-row">
         <div class="field"><label>বাগানের নাম:</label><input type="text" id="gardenInput" value="দাঁতমারা" oninput="updateHeader()"></div>
         <div class="field"><label>সূত্র:</label><input type="text" id="sutraInput" oninput="updateHeader()"></div>
@@ -87,47 +107,49 @@
     </div>
     <div class="input-row">
         <div class="field"><label>গাছের নম্বর/পিস:</label><input type="text" id="pieceNo" value="1/1" onkeydown="handleEnter(event, 'girth')"></div>
-        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" onkeydown="handleEnter(event, 'length')"></div>
-        <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" onkeydown="handleEnterLength(event)"></div>
+        <div class="field"><label>বেড় (ইঞ্চি):</label><input type="text" id="girth" placeholder="ইংরেজি সংখ্যা" onkeydown="handleEnter(event, 'length')"></div>
+        <div class="field"><label>লম্বা (ফুট):</label><input type="text" id="length" placeholder="ইংরেজি সংখ্যা" onkeydown="handleEnterLength(event)"></div>
     </div>
     <div class="btn-group">
         <button class="btn-add" id="mainAddBtn" onclick="addNewSize()">+ লিস্টে যোগ করুন</button>
-        <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট করুন</button>
-        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 ব্যাকআপ</button>
-        <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 আর্কাইভ</button>
-        <button style="background:#d90429; color:white" onclick="clearCurrent()">মুছুন</button>
+        <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
+        <button style="background:#0891b2; color:white" onclick="archiveTruck()">🚚 নতুন ট্রাক (Archive)</button>
+        <button style="background:#1e40af; color:white" onclick="saveDataFile()">💾 ব্যাকআপ ফাইল</button>
+        <button style="background:#d90429; color:white" onclick="clearCurrent()">তালিকা ক্লিয়ার</button>
     </div>
-    <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:5px;">অটো সেভ সচল...</div>
+    <div id="autoSaveStatus" style="font-size:12px; color:green; margin-top:10px; text-align:center;">অটো সেভ সচল...</div>
 </div>
 
-<div class="wrapper">
-    <!-- Center Logo Watermark -->
-    <img src="logo.png" class="watermark" alt="Logo">
+<div class="preview-container">
+    <div class="wrapper">
+        <!-- Watermark Logo repeats on every page in print -->
+        <img src="logo.png" class="watermark" alt="Logo">
 
-    <div class="header-section">
-        <h2>বিএফআইডিসি, <span id="gardenLabel">দাঁতমারা</span> রাবার বাগানের জীবনচক্র হারানো রাবার গাছের পরিমাপকৃত সাইজ লিস্ট</h2>
+        <div class="header-section">
+            <h2>বিএফআইডিসি, <span id="gardenLabel">দাঁতমারা</span> রাবার বাগানের জীবনচক্র হারানো রাবার গাছের পরিমাপকৃত সাইজ লিস্ট</h2>
+        </div>
+        <div class="meta-info">
+            <div>সূত্র : <span id="sutraLabel">........</span></div>
+            <div style="text-align: center;">তারিখ: <span id="dateLabel">........</span></div>
+            <div style="text-align: right;">ট্রাক নং: <span id="truckLabel">........</span></div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
+                    <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
+                    <th style="width: 6%;" class="action-btns">E</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody"></tbody>
+        </table>
+        <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
     </div>
-    <div class="meta-info">
-        <div>সূত্র : <span id="sutraLabel">........</span></div>
-        <div style="text-align: center;">তারিখ: <span id="dateLabel">........</span></div>
-        <div style="text-align: right;">ট্রাক নং: <span id="truckLabel">........</span></div>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                <th style="width: 7%;">ক্রমিক</th><th style="width: 14%;">গাছের নম্বর</th><th style="width: 16%;">পরিমাপ</th><th style="width: 10%;">ঘনফুট</th>
-                <th style="width: 6%;" class="action-btns">E</th>
-            </tr>
-        </thead>
-        <tbody id="dataTableBody"></tbody>
-    </table>
-    <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
 </div>
 
-<div class="history-section" style="max-width: 950px; margin: 20px auto; padding:15px; background:#fff; border-radius:8px; border:1px solid #94a3b8;">
-    <h3>📜 সংরক্ষিত ট্রাক (History)</h3>
-    <div id="historyList"></div>
+<div class="history-section" style="max-width: 950px; margin: 10px auto; padding:15px; background:#fff; border-radius:10px; border:1px solid #94a3b8;">
+    <h3 style="margin-bottom:10px; font-size:16px;">📜 সংরক্ষিত ট্রাক (History)</h3>
+    <div id="historyList" style="font-size:14px;"></div>
 </div>
 
 <script>
@@ -135,8 +157,9 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
+    // সংখ্যা বাংলা করা
     function toBn(n) {
-        if (!n) return n === 0 ? '০' : '';
+        if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
         return n.toString().split('').map(char => bn[char] || char).join('');
     }
@@ -161,6 +184,7 @@
 
         const g = parseFloat(gVal);
         const l = parseFloat(lVal);
+        // ২.২৬৬২৫ আসলে ২.২৬ দেখানো (Truncate logic)
         const cft = (Math.floor(((g * g * l) / 2304) * 100) / 100).toFixed(2);
         const entry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: cft };
 
@@ -223,6 +247,7 @@
         addBtn.innerText = "সংশোধন (Update)";
         addBtn.style.background = "#ca8a04";
         document.getElementById('girth').focus();
+        window.scrollTo(0, 0); 
     }
 
     function removeRow(idx) { if(confirm('ডিলিট করবেন?')) { records.splice(idx, 1); saveAndRender(); } }
@@ -239,7 +264,15 @@
 
     function renderHistory() {
         const hList = document.getElementById('historyList');
-        hList.innerHTML = historyLogs.map((h, i) => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;"><span>${toBn(h.truckNo)} - ${h.garden} (${toBn(h.date)})</span> <button onclick="editHistory(${i})">Edit</button></div>`).join('');
+        hList.innerHTML = historyLogs.length === 0 ? "কোনো সংরক্ষিত ট্রাক নেই" : historyLogs.map((h, i) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                <span><b>${toBn(h.truckNo)}</b> - ${h.garden}</span>
+                <div>
+                    <button style="padding:5px 10px; background:#ca8a04; color:white; border:none; border-radius:4px;" onclick="editHistory(${i})">Edit</button>
+                    <button style="padding:5px 10px; background:#ef4444; color:white; border:none; border-radius:4px; margin-left:5px;" onclick="deleteHistory(${i})">X</button>
+                </div>
+            </div>
+        `).join('');
     }
 
     function editHistory(idx) {
@@ -250,8 +283,12 @@
         records = h.data;
         updateHeader();
         saveAndRender();
+        window.scrollTo(0, 0);
     }
 
+    function deleteHistory(idx) { if(confirm('হিস্ট্রি থেকে ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
+
+    // ১৫ সেকেন্ডের অটো সেভ
     setInterval(() => {
         localStorage.setItem('bfidc_records', JSON.stringify(records));
         document.getElementById('autoSaveStatus').innerText = "অটো সেভ: " + toBn(new Date().toLocaleTimeString());
@@ -259,7 +296,7 @@
 
     function saveDataFile() {
         const blob = new Blob([JSON.stringify({ records, history: historyLogs })], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "BFIDC_Data.json"; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "BFIDC_Data_Backup.json"; a.click();
     }
 
     window.onload = () => { updateHeader(); saveAndRender(); };
