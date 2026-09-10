@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - MARGIN 0.5 FIXED</title>
+    <title>BFIDC WOOD ERP - FINAL PRO VERSION</title>
     <style>
-        /* অফলাইনে চালানোর জন্য সিস্টেম ফন্ট */
+        /* অফলাইন মোড ও ফন্ট সেটিংস */
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -14,7 +14,7 @@
         }
         body { background: #f0f2f5; padding: 10px; color: #000; }
 
-        /* Input Panel (Screen Only) */
+        /* ইনপুট প্যানেল ডিজাইন */
         .input-panel { 
             max-width: 950px; margin: 0 auto 20px auto; background: #fff; padding: 15px; 
             border-radius: 10px; border: 2px solid #1b4332; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
@@ -38,13 +38,13 @@
             min-height: 297mm; 
             margin: 0 auto; 
             background: #fff; 
-            padding: 0.5in; /* চতুর্দিকে ০.৫ ইঞ্চি মার্জিন */
+            padding: 0.5in; 
             border: 1px solid #ccc; 
             position: relative; 
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
 
-        /* Fixed Watermark Logo for all pages */
+        /* Watermark Logo (Fixed for all pages) */
         .watermark {
             position: fixed; 
             top: 50%; left: 50%; 
@@ -71,20 +71,18 @@
         .edit-btn { background: #ca8a04; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px; border: none; }
         .del-btn { background: #ef4444; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px; border: none; }
 
+        /* Summary Container */
         .summary-container { 
-            margin-top: 10px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 5px; page-break-inside: avoid; 
+            margin-top: 15px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 8px; page-break-inside: avoid; 
         }
-        .totals-footer { font-weight: bold; font-size: 16px; }
-        .in-words { font-weight: bold; font-size: 15px; margin-top: 5px; color: #000; line-height: 1.4; }
+        .totals-footer { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .in-words { font-weight: bold; font-size: 15px; color: #000; line-height: 1.5; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
             body { background: none; padding: 0; }
             .wrapper { border: none; width: 100%; margin: 0; min-height: auto; box-shadow: none; padding: 0.5in; }
-            @page { 
-                size: A4; 
-                margin: 0.5in; /* প্রিন্টারে ০.৫ ইঞ্চি মার্জিন নিশ্চিত করা */
-            }
+            @page { size: A4; margin: 0.5in; }
             .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
         }
     </style>
@@ -139,14 +137,14 @@
             <tbody id="dataTableBody"></tbody>
         </table>
         <div class="summary-container">
-            <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি পিস = মোট ঘনফুট: ০.০০</div>
-            <div class="in-words" id="inWordsText">কথায়: শূণ্য টি গাছে শূণ্য টি টুকরা সমান শূণ্য দশমিক শূণ্য ঘনফুট।</div>
+            <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি টুকরা = মোট ঘনফুট: ০.০০</div>
+            <div class="in-words" id="inWordsText">কথায়: শূণ্য টি গাছের শূণ্য টুকরা সমান শূণ্য দশমিক শূণ্য শূণ্য ঘনফুট।</div>
         </div>
     </div>
 </div>
 
 <div class="history-section" style="max-width: 950px; margin: 10px auto; padding:15px; background:#fff; border-radius:10px; border:1px solid #94a3b8;">
-    <h3 style="margin-bottom:10px; font-size:16px;">📜 History (সংরক্ষিত ট্রাক)</h3>
+    <h3 style="margin-bottom:10px; font-size:16px;">📜 History (সংরক্ষিত ট্রাক সমূহ)</h3>
     <div id="historyList"></div>
 </div>
 
@@ -155,39 +153,44 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
-    const bnDigitWords = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
+    const bnDigits = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
 
+    // ইংরেজী থেকে বাংলা অংক
     function toBn(n) {
         if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
         return n.toString().split('').map(char => bn[char] || char).join('');
     }
 
-    function treeSetToWords(n) {
+    // পূর্ণ সংখ্যার জন্য বাংলা কথা (১-৯৯৯ পর্যন্ত)
+    function numberToBengaliWords(n) {
         const unit = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
         const teen = ["দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ"];
         const tens = ["", "", "বিশ", "ত্রিশ", "চল্লিশ", "পঞ্চাশ", "ষাট", "সত্তুর", "আশি", "নব্বই"];
         let num = parseInt(n);
         if (num === 0) return "শূণ্য";
         let str = "";
-        if (num >= 100) { str += unit[Math.floor(num/100)] + " শত "; num %= 100; }
+        if (num >= 100) { str += unit[Math.floor(num/100)] + "শত "; num %= 100; }
         if (num >= 20) { str += tens[Math.floor(num/10)] + " "; num %= 10; str += unit[num]; }
         else if (num >= 10) { str += teen[num-10]; }
         else { str += unit[num]; }
         return str.trim();
     }
 
-    function decimalToWords(n) {
-        return n.toString().split('').map(digit => bnDigitWords[parseInt(digit)] || "").join(' ');
+    // দশমিকের পরের সংখ্যাগুলো আলাদা করে বলার জন্য
+    function decimalToIndividualWords(n) {
+        return n.toString().split('').map(digit => bnDigits[parseInt(digit)] || "").join(' ');
     }
 
+    // চূড়ান্ত "কথায়" জেনারেটর
     function convertToFullWords(trees, pieces, cft) {
-        let treeWords = treeSetToWords(trees);
-        let pieceWords = treeSetToWords(pieces);
+        let treeWords = numberToBengaliWords(trees);
+        let pieceWords = numberToBengaliWords(pieces);
         let cftParts = cft.toString().split('.');
-        let cftIntWords = treeSetToWords(cftParts[0]);
-        let cftDecWords = decimalToWords(cftParts[1] || "00");
-        return `কথায়: ${treeWords} টি গাছে ${pieceWords} টি টুকরা সমান ${cftIntWords} দশমিক ${cftDecWords} ঘনফুট।`;
+        let integerPartWords = numberToBengaliWords(cftParts[0]);
+        let fractionalPartWords = decimalToIndividualWords(cftParts[1] || "00");
+
+        return `কথায়: ${treeWords} টি গাছের ${pieceWords} টুকরা সমান ${integerPartWords} দশমিক ${fractionalPartWords} ঘনফুট।`;
     }
 
     function handleEnter(e, nextId) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById(nextId).focus(); } }
@@ -203,11 +206,12 @@
         const pNoField = document.getElementById('pieceNo');
         const gVal = document.getElementById('girth').value;
         const lVal = document.getElementById('length').value;
+        const addBtn = document.getElementById('mainAddBtn');
         if (!pNoField.value || !gVal || !lVal) return alert('সব ঘর পূরণ করুন');
         const g = parseFloat(gVal); const l = parseFloat(lVal);
         const cft = (Math.floor(((g * g * l) / 2304) * 100) / 100).toFixed(2);
         const entry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: cft };
-        if (editIndex !== null) { records[editIndex] = entry; editIndex = null; document.getElementById('mainAddBtn').innerText = "+ লিস্টে যোগ করুন"; }
+        if (editIndex !== null) { records[editIndex] = entry; editIndex = null; addBtn.innerText = "+ লিস্টে যোগ করুন"; }
         else { records.push(entry); let parts = pNoField.value.split('/'); if (parts.length === 2 && !isNaN(parts[1])) { pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1); } }
         document.getElementById('girth').value = ''; document.getElementById('length').value = ''; pNoField.focus(); saveAndRender();
     }
@@ -230,7 +234,7 @@
         }
         records.forEach(r => { totalCft += parseFloat(r.cft); treeSet.add(r.pNo.split('/')[0]); });
         const totalStr = totalCft.toFixed(2);
-        document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি পিস = মোট ঘনফুট: ${toBn(totalStr)}`;
+        document.getElementById('summaryText').innerText = `${toBn(treeSet.size)} টি গাছের ${toBn(records.length)} টি টুকরা = মোট ঘনফুট: ${toBn(totalStr)}`;
         document.getElementById('inWordsText').innerText = convertToFullWords(treeSet.size, records.length, totalStr);
         renderHistory();
     }
@@ -259,7 +263,7 @@
 
     function editHistory(idx) {
         const h = historyLogs[idx]; document.getElementById('truckInput').value = h.truckNo; document.getElementById('gardenInput').value = h.garden; document.getElementById('dateInput').value = h.date;
-        records = h.data; updateHeader(); saveAndRender();
+        records = h.data; updateHeader(); saveAndRender(); window.scrollTo(0, 0);
     }
 
     function deleteHistory(idx) { if(confirm('ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
