@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - FINAL PRO VERSION</title>
+    <title>BFIDC WOOD ERP - HISTORY FIXED VERSION</title>
     <style>
         /* অফলাইন মোড ও ফন্ট সেটিংস */
         * { 
@@ -155,14 +155,12 @@
 
     const bnDigits = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
 
-    // ইংরেজী থেকে বাংলা অংক
     function toBn(n) {
         if (!n && n !== 0) return '';
         const bn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','/':'/','.':'.'};
         return n.toString().split('').map(char => bn[char] || char).join('');
     }
 
-    // পূর্ণ সংখ্যার জন্য বাংলা কথা (১-৯৯৯ পর্যন্ত)
     function numberToBengaliWords(n) {
         const unit = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
         const teen = ["দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ"];
@@ -177,12 +175,10 @@
         return str.trim();
     }
 
-    // দশমিকের পরের সংখ্যাগুলো আলাদা করে বলার জন্য
     function decimalToIndividualWords(n) {
         return n.toString().split('').map(digit => bnDigits[parseInt(digit)] || "").join(' ');
     }
 
-    // চূড়ান্ত "কথায়" জেনারেটর
     function convertToFullWords(trees, pieces, cft) {
         let treeWords = numberToBengaliWords(trees);
         let pieceWords = numberToBengaliWords(pieces);
@@ -250,20 +246,28 @@
 
     function archiveTruck() {
         if (records.length === 0) return alert('ডাটা নেই!');
-        historyLogs.push({ truckNo: document.getElementById('truckInput').value, garden: document.getElementById('gardenInput').value, date: document.getElementById('dateInput').value, data: [...records] });
-        localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); records = []; saveAndRender();
+        historyLogs.push({ truckNo: document.getElementById('truckInput').value, garden: document.getElementById('gardenInput').value, sutra: document.getElementById('sutraInput').value, date: document.getElementById('dateInput').value, data: [...records] });
+        localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); records = []; saveAndRender(); alert('আর্কাইভ সম্পন্ন!');
     }
 
     function renderHistory() {
         const hList = document.getElementById('historyList');
-        hList.innerHTML = historyLogs.map((h, i) => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
-            <span><b>${toBn(h.truckNo)}</b> - ${h.garden}</span>
-            <div><button onclick="editHistory(${i})">Edit</button> <button onclick="deleteHistory(${i})">X</button></div></div>`).join('');
+        hList.innerHTML = historyLogs.length === 0 ? "কোনো সংরক্ষিত ট্রাক নেই" : historyLogs.map((h, i) => `
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+                <span><b>${toBn(h.truckNo)}</b> - ${h.garden} (${toBn(h.date)})</span>
+                <div><button onclick="editHistory(${i})">Edit</button> <button onclick="deleteHistory(${i})">X</button></div></div>`).join('');
     }
 
     function editHistory(idx) {
-        const h = historyLogs[idx]; document.getElementById('truckInput').value = h.truckNo; document.getElementById('gardenInput').value = h.garden; document.getElementById('dateInput').value = h.date;
-        records = h.data; updateHeader(); saveAndRender(); window.scrollTo(0, 0);
+        const h = historyLogs[idx]; 
+        document.getElementById('gardenInput').value = h.garden || 'দাঁতমারা';
+        document.getElementById('sutraInput').value = h.sutra || '';
+        document.getElementById('dateInput').value = h.date || '';
+        document.getElementById('truckInput').value = h.truckNo || '';
+        records = h.data; 
+        updateHeader(); 
+        saveAndRender(); 
+        window.scrollTo(0, 0);
     }
 
     function deleteHistory(idx) { if(confirm('ডিলিট করবেন?')) { historyLogs.splice(idx, 1); localStorage.setItem('bfidc_history', JSON.stringify(historyLogs)); renderHistory(); } }
@@ -305,8 +309,13 @@
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader(); reader.onload = function(ev) {
             const data = JSON.parse(ev.target.result);
-            document.getElementById('sutraInput').value = data.sutra || ''; document.getElementById('dateInput').value = data.date || ''; document.getElementById('truckInput').value = data.truck || '';
-            records = data.records || []; updateHeader(); saveAndRender();
+            document.getElementById('gardenInput').value = data.garden || 'দাঁতমারা';
+            document.getElementById('sutraInput').value = data.sutra || '';
+            document.getElementById('dateInput').value = data.date || '';
+            document.getElementById('truckInput').value = data.truck || '';
+            records = data.records || []; 
+            updateHeader(); 
+            saveAndRender();
         }; reader.readAsText(file);
     }
 
