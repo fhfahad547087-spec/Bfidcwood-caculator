@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - HISTORY FIXED VERSION</title>
+    <title>BFIDC WOOD ERP - EDITABLE HISTORY & SUMMARY</title>
     <style>
         /* অফলাইন মোড ও ফন্ট সেটিংস */
         * { 
@@ -76,7 +76,8 @@
             margin-top: 15px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 8px; page-break-inside: avoid; 
         }
         .totals-footer { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-        .in-words { font-weight: bold; font-size: 15px; color: #000; line-height: 1.5; }
+        .in-words { font-weight: bold; font-size: 15px; color: #000; line-height: 1.5; outline: none; border: 1px dashed transparent; display: block; width: 100%; }
+        .in-words:hover { border-color: #ccc; cursor: text; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
@@ -84,6 +85,7 @@
             .wrapper { border: none; width: 100%; margin: 0; min-height: auto; box-shadow: none; padding: 0.5in; }
             @page { size: A4; margin: 0.5in; }
             .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
+            .in-words { border: none; }
         }
     </style>
 </head>
@@ -138,7 +140,8 @@
         </table>
         <div class="summary-container">
             <div class="totals-footer" id="summaryText">০ টি গাছের ০ টি টুকরা = মোট ঘনফুট: ০.০০</div>
-            <div class="in-words" id="inWordsText">কথায়: শূণ্য টি গাছের শূণ্য টুকরা সমান শূণ্য দশমিক শূণ্য শূণ্য ঘনফুট।</div>
+            <!-- কন্টেন্ট এডিটেবল করা হয়েছে যাতে প্রয়োজনে ম্যানুয়ালি এডিট করা যায় -->
+            <div class="in-words" id="inWordsText" contenteditable="true">কথায়: শূণ্য টি গাছের শূণ্য টুকরা সমান শূণ্য দশমিক শূণ্য শূণ্য ঘনফুট।</div>
         </div>
     </div>
 </div>
@@ -153,7 +156,7 @@
     let historyLogs = JSON.parse(localStorage.getItem('bfidc_history')) || [];
     let editIndex = null;
 
-    const bnDigits = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
+    const bnDigitsWords = ["শূণ্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
 
     function toBn(n) {
         if (!n && n !== 0) return '';
@@ -161,6 +164,7 @@
         return n.toString().split('').map(char => bn[char] || char).join('');
     }
 
+    // সংখ্যাকে বাংলা কথায় রূপান্তর (১-৯৯৯ পর্যন্ত)
     function numberToBengaliWords(n) {
         const unit = ["", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়"];
         const teen = ["দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ"];
@@ -175,10 +179,12 @@
         return str.trim();
     }
 
+    // দশমিকের পরের অংশ আলাদা করে বলা
     function decimalToIndividualWords(n) {
-        return n.toString().split('').map(digit => bnDigits[parseInt(digit)] || "").join(' ');
+        return n.toString().split('').map(digit => bnDigitsWords[parseInt(digit)] || "").join(' ');
     }
 
+    // কথায় জেনারেটর
     function convertToFullWords(trees, pieces, cft) {
         let treeWords = numberToBengaliWords(trees);
         let pieceWords = numberToBengaliWords(pieces);
