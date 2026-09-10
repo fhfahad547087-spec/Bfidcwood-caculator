@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BFIDC WOOD ERP - FULL OFFLINE VERSION</title>
+    <title>BFIDC WOOD ERP - MARGIN 0.5 FIXED</title>
     <style>
-        /* অফলাইনে চালানোর জন্য সিস্টেম ফন্ট ব্যবহার করা হয়েছে */
+        /* অফলাইনে চালানোর জন্য সিস্টেম ফন্ট */
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -14,7 +14,7 @@
         }
         body { background: #f0f2f5; padding: 10px; color: #000; }
 
-        /* Input Panel */
+        /* Input Panel (Screen Only) */
         .input-panel { 
             max-width: 950px; margin: 0 auto 20px auto; background: #fff; padding: 15px; 
             border-radius: 10px; border: 2px solid #1b4332; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
@@ -31,43 +31,60 @@
         .btn-word { background: #2b5797; color: white; }
         .btn-print { background: #333; color: white; }
 
-        /* A4 Layout & Watermark */
+        /* A4 Layout with 0.5 Margin */
         .preview-container { width: 100%; overflow-x: auto; padding-bottom: 20px; }
         .wrapper { 
-            width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 15mm; 
-            border: 1px solid #ccc; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            width: 210mm; 
+            min-height: 297mm; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 0.5in; /* চতুর্দিকে ০.৫ ইঞ্চি মার্জিন */
+            border: 1px solid #ccc; 
+            position: relative; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
+
+        /* Fixed Watermark Logo for all pages */
         .watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 140mm; opacity: 0.12; z-index: 0; pointer-events: none;
-            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+            position: fixed; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            width: 140mm; 
+            opacity: 0.12; 
+            z-index: 0; 
+            pointer-events: none;
+            display: block;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         .header-section { text-align: center; margin-bottom: 10px; position: relative; z-index: 1; }
-        .header-section h2 { font-size: 19px; font-weight: bold; text-decoration: underline; line-height: 1.4; }
+        .header-section h2 { font-size: 18px; font-weight: bold; text-decoration: underline; line-height: 1.4; }
         
-        .meta-info { display: flex; justify-content: space-between; margin-top: 15px; font-size: 17px; font-weight: bold; position: relative; z-index: 1; }
+        .meta-info { display: flex; justify-content: space-between; margin-top: 15px; font-size: 16px; font-weight: bold; position: relative; z-index: 1; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; position: relative; z-index: 1; }
-        th, td { border: 1px solid #000; padding: 4px 2px; text-align: center; font-size: 15px; }
+        th, td { border: 1px solid #000; padding: 4px 2px; text-align: center; font-size: 14px; }
         th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
 
         .action-btns { display: flex; justify-content: center; gap: 2px; border: none !important; }
-        .edit-btn { background: #ca8a04; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
-        .del-btn { background: #ef4444; color: white; font-size: 11px; padding: 2px 4px; border-radius: 3px; border: none; }
+        .edit-btn { background: #ca8a04; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px; border: none; }
+        .del-btn { background: #ef4444; color: white; font-size: 10px; padding: 2px 4px; border-radius: 3px; border: none; }
 
-        /* Footer Summary */
         .summary-container { 
             margin-top: 10px; position: relative; z-index: 1; border-top: 1px solid #000; padding-top: 5px; page-break-inside: avoid; 
         }
-        .totals-footer { font-weight: bold; font-size: 17px; }
-        .in-words { font-weight: bold; font-size: 16px; margin-top: 5px; color: #000; }
+        .totals-footer { font-weight: bold; font-size: 16px; }
+        .in-words { font-weight: bold; font-size: 15px; margin-top: 5px; color: #000; line-height: 1.4; }
 
         @media print {
             .input-panel, .history-section, .action-btns, #autoSaveStatus { display: none !important; }
             body { background: none; padding: 0; }
-            .wrapper { border: none; padding: 10mm; width: 100%; margin: 0; min-height: auto; }
-            @page { size: A4; margin: 0; }
+            .wrapper { border: none; width: 100%; margin: 0; min-height: auto; box-shadow: none; padding: 0.5in; }
+            @page { 
+                size: A4; 
+                margin: 0.5in; /* প্রিন্টারে ০.৫ ইঞ্চি মার্জিন নিশ্চিত করা */
+            }
             .watermark { position: fixed !important; opacity: 0.15 !important; display: block !important; }
         }
     </style>
@@ -186,12 +203,11 @@
         const pNoField = document.getElementById('pieceNo');
         const gVal = document.getElementById('girth').value;
         const lVal = document.getElementById('length').value;
-        const addBtn = document.getElementById('mainAddBtn');
         if (!pNoField.value || !gVal || !lVal) return alert('সব ঘর পূরণ করুন');
         const g = parseFloat(gVal); const l = parseFloat(lVal);
         const cft = (Math.floor(((g * g * l) / 2304) * 100) / 100).toFixed(2);
         const entry = { pNo: pNoField.value, gVal: g, lVal: l, size: `${g}"×${l}'`, cft: cft };
-        if (editIndex !== null) { records[editIndex] = entry; editIndex = null; addBtn.innerText = "+ লিস্টে যোগ করুন"; }
+        if (editIndex !== null) { records[editIndex] = entry; editIndex = null; document.getElementById('mainAddBtn').innerText = "+ লিস্টে যোগ করুন"; }
         else { records.push(entry); let parts = pNoField.value.split('/'); if (parts.length === 2 && !isNaN(parts[1])) { pNoField.value = parts[0] + '/' + (parseInt(parts[1]) + 1); } }
         document.getElementById('girth').value = ''; document.getElementById('length').value = ''; pNoField.focus(); saveAndRender();
     }
@@ -270,7 +286,7 @@
                 <td style="border:1px solid black; text-align:center;">${right ? toBn(right.cft) : ''}</td>
             </tr>`;
         }
-        const html = `<html><head><meta charset='utf-8'><style>body{font-family:sans-serif;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid black;padding:5px;font-size:12pt;}</style></head><body><div style="text-align:center;"><h3><u>${header}</u></h3></div><table style="border:none;width:100%;"><tr><td style="border:none;">সূত্র: ${sutra}</td><td style="border:none;text-align:center;">তারিখ: ${date}</td><td style="border:none;text-align:right;">ট্রাক নং: ${truck}</td></tr></table><br><table><thead><tr style="background-color:#eee;"><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th></tr></thead><tbody>${tableContent}</tbody></table><div style="margin-top:10px;"><strong>${summary}</strong><br><strong>${words}</strong></div></body></html>`;
+        const html = `<html><head><meta charset='utf-8'><style>body{font-family:sans-serif; margin: 0.5in;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid black;padding:5px;font-size:11pt;}</style></head><body><div style="text-align:center;"><h3><u>${header}</u></h3></div><table style="border:none;width:100%;"><tr><td style="border:none;">সূত্র: ${sutra}</td><td style="border:none;text-align:center;">তারিখ: ${date}</td><td style="border:none;text-align:right;">ট্রাক নং: ${truck}</td></tr></table><br><table><thead><tr style="background-color:#eee;"><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th><th>ক্রমিক</th><th>গাছের নম্বর</th><th>পরিমাপ</th><th>ঘনফুট</th></tr></thead><tbody>${tableContent}</tbody></table><div style="margin-top:10px;"><strong>${summary}</strong><br><strong>${words}</strong></div></body></html>`;
         const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
         const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `BFIDC_${truck || 'List'}.doc`; link.click();
     }
